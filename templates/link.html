@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Link Your Amex Card</h1>
+<p>This opens Plaid Link to securely connect your Amex Gold card. Requires a Plaid
+developer account with Trial or Production access - see README.md.</p>
+<button id="link-button" data-mode="link">Link Amex Card</button>
+<script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+{% endblock %}

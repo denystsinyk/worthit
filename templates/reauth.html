@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Reconnect Amex Card</h1>
+<p>Amex connections through Plaid periodically need re-authentication. This
+won't create a duplicate connection - it just refreshes your existing one.</p>
+<button id="link-button" data-mode="update">Reconnect</button>
+<script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+{% endblock %}

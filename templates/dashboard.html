@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Amex Gold Benefits</h1>
+
+{% if not linked %}
+  <div class="banner">
+    Not linked yet. <a href="{{ url_for('link_page') }}">Link your Amex card via Plaid</a> to start tracking.
+  </div>
+{% elif reconnect_needed %}
+  <div class="banner banner-warning">
+    Amex connection needs re-authentication. <a href="{{ url_for('reauth_page') }}">Reconnect now</a>.
+  </div>
+{% endif %}
+
+{% if unreviewed_count %}
+  <div class="banner">
+    {{ unreviewed_count }} transaction(s) need review —
+    <a href="{{ url_for('triage_view') }}">check unmatched credits</a>.
+  </div>
+{% endif %}
+
+{% if linked %}
+<form method="post" action="{{ url_for('force_sync') }}" class="inline-form">
+  <button type="submit">Sync Now</button>
+</form>
+{% if sync_state and sync_state['last_synced_at'] %}
+  <span class="muted">Last synced: {{ sync_state['last_synced_at'] }}</span>
+{% endif %}
+{% endif %}
+
+<div class="cards">
+  {% for s in statuses %}
+  <div class="card state-{{ s.state }}">
+    <h2>{{ s.benefit.label }}</h2>
+    <p class="progress">${{ "%.2f"|format(s.amount_used) }} / ${{ "%.2f"|format(s.amount_total) }}</p>
+    <p class="state-label">{{ s.state|upper }}</p>
+    <p class="muted">{{ s.period_start }} – {{ s.period_end }} ({{ s.days_remaining }} days left)</p>
+    {% if s.posting_lag_note %}<p class="note">{{ s.posting_lag_note }}</p>{% endif %}
+    {% if s.benefit.enrollment_required %}<p class="note">Requires enrollment on amex.com.</p>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

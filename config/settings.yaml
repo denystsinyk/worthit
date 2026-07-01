@@ -1,0 +1,12 @@
+# App-wide settings, separate from benefits.yaml since these tune behavior
+# rather than define what a benefit is.
+
+# How stale sync_state.last_synced_at must be before the dashboard
+# auto-triggers a Plaid sync on page load (the "Sync Now" button always
+# force-syncs regardless of this).
+sync_stale_minutes: 60
+
+# Days remaining in a period, with $0 used, before a benefit is flagged
+# "at risk" on the dashboard.
+at_risk_days_monthly: 7
+at_risk_days_semiannual: 21

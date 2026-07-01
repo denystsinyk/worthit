@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Review Unmatched Credits</h1>
+<p>These look like statement credits but don't match a known benefit pattern
+yet. Label each one so future transactions with similar text match automatically.</p>
+
+{% if not transactions %}
+  <p>Nothing to review right now.</p>
+{% endif %}
+
+<table>
+  <thead>
+    <tr><th>Date</th><th>Merchant</th><th>Description</th><th>Amount</th><th>Assign to</th></tr>
+  </thead>
+  <tbody>
+  {% for t in transactions %}
+    <tr>
+      <td>{{ t['date'] }}</td>
+      <td>{{ t['merchant_name'] or '—' }}</td>
+      <td>{{ t['name'] or '—' }}</td>
+      <td>${{ "%.2f"|format(t['amount']|abs) }}</td>
+      <td>
+        <form method="post" action="{{ url_for('triage_label', transaction_id=t['transaction_id']) }}">
+          <select name="assigned_benefit_id">
+            {% for b in benefits %}<option value="{{ b.id }}">{{ b.label }}</option>{% endfor %}
+            <option value="ignore">Ignore (not a benefit)</option>
+          </select>
+          <input type="text" name="note" placeholder="optional note">
+          <button type="submit">Save</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

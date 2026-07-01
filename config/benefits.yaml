@@ -1,0 +1,84 @@
+# Editable benefit definitions. Amounts/patterns can be changed here without
+# touching any code. See README.md for the full field reference.
+#
+# detection_mode:
+#   spend_threshold -> credit is auto-applied once you spend >= amount at a
+#                       matching merchant this period (no separate credit txn
+#                       shows up in the feed, e.g. Uber).
+#   credit_match    -> Amex posts its own statement-credit transaction after
+#                       you pay the merchant; we look for that credit txn.
+#
+# match.merchant_contains / match.description_contains: lists of substrings,
+# checked case-insensitively against the transaction's merchant name + raw
+# description together. All substrings in one rule must match (AND).
+# match.merchant_credit_pairs: alternative rules (OR) - matches if ANY listed
+# pair matches, useful when a benefit covers several distinct merchants.
+
+benefits:
+  - id: uber
+    label: "Uber/Uber Eats Credit"
+    amount: 10.00
+    period: monthly
+    detection_mode: spend_threshold
+    match:
+      merchant_contains: ["UBER"]
+    notes: >
+      Amex auto-credits $10/mo once you spend >= $10 at Uber or Uber Eats in
+      the calendar month. This does NOT appear as its own credit transaction
+      in the card feed -- detection is spend-threshold based on total Uber
+      spend, not a credit-match.
+
+  - id: dining
+    label: "Dining Credit"
+    amount: 10.00
+    amount_cap: 10.00
+    period: monthly
+    detection_mode: credit_match
+    match:
+      description_contains: ["DINING", "CREDIT"]
+      merchant_credit_pairs:
+        - merchant_contains: ["GRUBHUB"]
+          description_contains: ["CREDIT"]
+        - merchant_contains: ["CHEESECAKE"]
+          description_contains: ["CREDIT"]
+        - merchant_contains: ["FIVE GUYS"]
+          description_contains: ["CREDIT"]
+        - merchant_contains: ["GOLDBELLY"]
+          description_contains: ["CREDIT"]
+    notes: >
+      UNCONFIRMED PATTERN - based on how the Dunkin credit appears
+      ("-7.00 Amex Dunkin Credit"), guessing this shows similarly, e.g.
+      "Amex Dining Credit". Enrolled merchant list can change over time --
+      check the unmatched-credits triage view after your next statement and
+      update these patterns if the real transaction text differs.
+
+  - id: dunkin
+    label: "Dunkin' Credit"
+    amount: 7.00
+    amount_cap: 7.00
+    period: monthly
+    detection_mode: credit_match
+    match:
+      description_contains: ["DUNKIN", "CREDIT"]
+    notes: "Confirmed pattern from real data: '-7.00 Amex Dunkin Credit'."
+
+  - id: resy
+    label: "Resy Credit"
+    amount: 50.00
+    amount_cap: 50.00
+    period: semiannual_calendar
+    detection_mode: credit_match
+    enrollment_required: true
+    posting_lag_days: 56
+    match:
+      description_contains: ["RESY", "CREDIT"]
+    purchase_hint:
+      merchant_contains: ["RESY"]
+    notes: >
+      UNCONFIRMED PATTERN - you haven't used this credit yet, so the real
+      transaction text is unknown. Also requires one-time manual enrollment
+      via the Benefits section of americanexpress.com. Credits can take up
+      to 8 weeks (56 days) to post after a qualifying purchase, so the
+      dashboard suppresses "at risk" warnings if a Resy purchase happened
+      recently. Update match.description_contains via the triage view once
+      you see the real credit transaction.

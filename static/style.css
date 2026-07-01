@@ -1,0 +1,106 @@
+body {
+  font-family: system-ui, sans-serif;
+  max-width: 900px;
+  margin: 2rem auto;
+  color: #1a1a1a;
+}
+
+nav a {
+  margin-right: 1rem;
+  font-weight: 600;
+}
+
+.banner {
+  background: #eef4ff;
+  border: 1px solid #b6d0ff;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin: 1rem 0;
+}
+
+.banner-warning {
+  background: #fff4e5;
+  border-color: #ffcf87;
+}
+
+.flash {
+  background: #eafbea;
+  border: 1px solid #9adf9a;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  list-style: none;
+}
+
+.inline-form {
+  display: inline-block;
+  margin-right: 0.75rem;
+}
+
+.muted {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.note {
+  font-size: 0.85em;
+  color: #8a5a00;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.card h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+.progress {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0.25rem 0;
+}
+
+.state-label {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.card.state-complete { border-color: #4caf50; }
+.card.state-complete .state-label { background: #e3f6e3; color: #2e7d32; }
+
+.card.state-partial { border-color: #ffb300; }
+.card.state-partial .state-label { background: #fff4d6; color: #8a5a00; }
+
+.card.state-none .state-label { background: #eee; color: #555; }
+
+.card.state-at_risk { border-color: #e53935; }
+.card.state-at_risk .state-label { background: #fdeaea; color: #c62828; }
+
+.card.state-pending { border-color: #7e57c2; }
+.card.state-pending .state-label { background: #f0ebfa; color: #5e35b1; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th, td {
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
