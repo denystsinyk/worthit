@@ -1,9 +1,17 @@
 {% extends "base.html" %}
+{% block title %}Connect your card — WorthIt{% endblock %}
 {% block content %}
-<h1>Link Your Amex Card</h1>
-<p>This opens Plaid Link to securely connect your Amex Gold card. Requires a Plaid
-developer account with Trial or Production access - see README.md.</p>
-<button id="link-button" data-mode="link">Link Amex Card</button>
+<section class="connection-page">
+  <p class="eyebrow">Secure connection</p>
+  <h1>Connect your Amex Gold</h1>
+  <p>WorthIt uses Plaid to read card transactions and recognize recurring benefits. Your credentials are handled by Plaid and never stored by this app.</p>
+  <div class="connection-detail">
+    <span>What gets stored</span>
+    <strong>A private, local transaction cache</strong>
+  </div>
+  <button class="button button-dark button-large" id="link-button" data-mode="link">Continue with Plaid</button>
+  <a class="text-link" href="{{ url_for('dashboard') }}">Back to dashboard</a>
+</section>
 <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
 <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
 {% endblock %}

@@ -49,6 +49,15 @@ def _compute_lookback_start(benefits: list[BenefitConfig], today: date) -> date:
     return min(starts) if starts else today
 
 
+def _dashboard_summary(statuses) -> dict:
+    return {
+        "used": sum(s.amount_used for s in statuses),
+        "available": sum(s.amount_total for s in statuses),
+        "complete": sum(s.state == "complete" for s in statuses),
+        "attention": sum(s.state == "at_risk" for s in statuses),
+    }
+
+
 @app.route("/")
 def dashboard():
     settings = load_settings()
@@ -67,6 +76,7 @@ def dashboard():
         return render_template(
             "dashboard.html",
             statuses=statuses,
+            summary=_dashboard_summary(statuses),
             linked=True,
             reconnect_needed=False,
             sync_state=None,
@@ -89,6 +99,7 @@ def dashboard():
     return render_template(
         "dashboard.html",
         statuses=statuses,
+        summary=_dashboard_summary(statuses),
         linked=bool(sync_state),
         reconnect_needed=reconnect_needed,
         sync_state=sync_state,

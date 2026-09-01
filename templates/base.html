@@ -3,29 +3,43 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Amex Benefit Tracker{% endblock %}</title>
+  <meta name="theme-color" content="#f4f1e8">
+  <meta name="description" content="A focused tracker for recurring Amex Gold benefits.">
+  <title>{% block title %}WorthIt — Amex Gold benefit tracker{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body class="{% if demo_mode %}is-demo{% endif %}">
   {% if demo_mode %}
-  <div class="banner banner-demo">
-    🔍 <strong>Demo</strong> - this shows mock data only, nothing here is connected to a real bank account.
-    See <a href="https://github.com/denystsinyk/worthit#readme">README.md</a> for instructions to run this
-    yourself with your own Amex account.
+  <div class="demo-strip">
+    <span><strong>Demo mode</strong> · mock data only · no bank connected</span>
+    <a href="https://github.com/denystsinyk/worthit#readme">View the project ↗</a>
   </div>
   {% endif %}
-  <nav>
-    <a href="{{ url_for('dashboard') }}">Dashboard</a>
-  </nav>
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul class="flash">
-        {% for m in messages %}<li>{{ m }}</li>{% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %}
-  <main>
-    {% block content %}{% endblock %}
-  </main>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="wordmark" href="{{ url_for('dashboard') }}" aria-label="WorthIt dashboard">
+        <span class="wordmark-mark" aria-hidden="true">W</span>
+        <span>WorthIt</span>
+      </a>
+      <div class="header-meta">
+        <span class="privacy-indicator">{% if demo_mode %}Demo data{% else %}Private & local{% endif %}</span>
+        <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+      </div>
+    </header>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flash" role="status">
+          {% for m in messages %}<li>{{ m }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+      <span>WorthIt · your benefits, made obvious.</span>
+      <span>Financial data stays on this device.</span>
+    </footer>
+  </div>
 </body>
 </html>
