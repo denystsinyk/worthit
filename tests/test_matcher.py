@@ -1,5 +1,7 @@
 from datetime import date
 
+import pytest
+
 from worthit.benefits import matcher
 from worthit.benefits.schema import MatchRule
 from tests.conftest import make_txn
@@ -29,12 +31,28 @@ def test_rule_matches_or_via_pairs():
     assert not matcher.rule_matches(rule, "Chipotle", "Amex Dining Credit")
 
 
-def test_confirmed_dunkin_real_pattern(benefit_by_id):
-    dunkin = benefit_by_id["dunkin"]
-    txn = make_txn(name="Amex Dunkin Credit", amount=-7.00, date_str="2026-06-10")
-    matched = matcher.match_transactions(dunkin, [txn], date(2026, 6, 1), date(2026, 6, 30))
+@pytest.mark.parametrize(
+    ("benefit_id", "description", "amount"),
+    [
+        ("dining", "AMEX DINING CREDIT", -10.00),
+        ("dunkin", "AMEX DUNKIN' CREDIT", -7.00),
+        ("resy", "AMEX RESY CREDIT", -50.00),
+    ],
+)
+def test_confirmed_real_statement_credit_patterns(
+    benefit_by_id, benefit_id, description, amount
+):
+    benefit = benefit_by_id[benefit_id]
+    txn = make_txn(name=description, amount=amount, date_str="2026-06-10")
+    matched = matcher.match_transactions(benefit, [txn], date(2026, 1, 1), date(2026, 6, 30))
     assert len(matched) == 1
-    assert matcher.compute_used_amount(dunkin, matched) == 7.00
+    assert matcher.compute_used_amount(benefit, matched) == abs(amount)
+
+
+def test_statement_credit_benefits_are_marked_as_requiring_enrollment(benefit_by_id):
+    assert benefit_by_id["dining"].enrollment_required
+    assert benefit_by_id["dunkin"].enrollment_required
+    assert benefit_by_id["resy"].enrollment_required
 
 
 def test_uber_spend_threshold(benefit_by_id):
@@ -71,28 +89,3 @@ def test_credit_match_capped_at_amount_cap(benefit_by_id):
     matched = matcher.match_transactions(dining, txns, date(2026, 6, 1), date(2026, 6, 30))
     assert len(matched) == 2
     assert matcher.compute_used_amount(dining, matched) == 10.00  # 14 raw, capped at 10
-
-
-def test_rematch_all_skips_labeled_and_ignored(benefits, tmp_path):
-    from worthit import db, models
-
-    conn = db.get_conn(tmp_path / "test.db")
-    db.init_db(conn)
-
-    models.upsert_transactions(
-        conn,
-        "item1",
-        [
-            {"transaction_id": "t1", "date": "2026-06-10", "amount": -7.00, "merchant_name": None, "name": "Amex Dunkin Credit"},
-            {"transaction_id": "t2", "date": "2026-06-11", "amount": -7.00, "merchant_name": None, "name": "Amex Dunkin Credit"},
-        ],
-    )
-    # Manually label t2 as belonging to "resy" (simulating a user override);
-    # rematch_all must not clobber that even though it would otherwise match dunkin.
-    models.label_transaction(conn, "t2", "resy", "user says this is actually resy")
-
-    matcher.rematch_all(conn, benefits)
-
-    rows = {r["transaction_id"]: r for r in models.get_all_transactions(conn)}
-    assert rows["t1"]["matched_benefit_id"] == "dunkin"
-    assert rows["t2"]["matched_benefit_id"] == "resy"

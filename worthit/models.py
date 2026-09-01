@@ -46,6 +46,15 @@ def update_sync_progress(
     conn.commit()
 
 
+def update_sync_error(conn: sqlite3.Connection, item_id: str, last_error: str) -> None:
+    """Record a failed attempt without claiming that a successful sync occurred."""
+    conn.execute(
+        "UPDATE sync_state SET last_error = ? WHERE item_id = ?",
+        (last_error, item_id),
+    )
+    conn.commit()
+
+
 def upsert_transactions(conn: sqlite3.Connection, item_id: str, txns: list[dict]) -> None:
     for t in txns:
         conn.execute(
@@ -71,7 +80,9 @@ def upsert_transactions(conn: sqlite3.Connection, item_id: str, txns: list[dict]
                 t.get("merchant_name"),
                 t.get("name"),
                 1 if t.get("pending") else 0,
-                json.dumps(t.get("raw_json", t)),
+                # Plaid SDK model dictionaries can contain date/datetime
+                # objects; retain their string form in the diagnostic payload.
+                json.dumps(t.get("raw_json", t), default=str),
             ),
         )
     conn.commit()
@@ -96,52 +107,3 @@ def get_transactions(
 
 def get_all_transactions(conn: sqlite3.Connection) -> list[sqlite3.Row]:
     return conn.execute("SELECT * FROM transactions ORDER BY date").fetchall()
-
-
-def get_transaction(conn: sqlite3.Connection, transaction_id: str) -> sqlite3.Row | None:
-    return conn.execute(
-        "SELECT * FROM transactions WHERE transaction_id = ?", (transaction_id,)
-    ).fetchone()
-
-
-def set_matched_benefit(conn: sqlite3.Connection, transaction_id: str, benefit_id: str | None) -> None:
-    conn.execute(
-        "UPDATE transactions SET matched_benefit_id = ? WHERE transaction_id = ?",
-        (benefit_id, transaction_id),
-    )
-    conn.commit()
-
-
-def get_unreviewed_credits(conn: sqlite3.Connection) -> list[sqlite3.Row]:
-    return conn.execute(
-        """
-        SELECT * FROM transactions
-        WHERE amount < 0 AND matched_benefit_id IS NULL AND triage_status = 'unreviewed'
-        ORDER BY date DESC
-        """
-    ).fetchall()
-
-
-def label_transaction(
-    conn: sqlite3.Connection,
-    transaction_id: str,
-    assigned_benefit_id: str | None,
-    note: str,
-) -> None:
-    triage_status = "ignored" if assigned_benefit_id is None else "labeled"
-    conn.execute(
-        "UPDATE transactions SET matched_benefit_id = ?, triage_status = ? WHERE transaction_id = ?",
-        (assigned_benefit_id, triage_status, transaction_id),
-    )
-    conn.execute(
-        """
-        INSERT INTO triage_labels (transaction_id, assigned_benefit_id, note, labeled_at)
-        VALUES (?, ?, ?, ?)
-        ON CONFLICT(transaction_id) DO UPDATE SET
-            assigned_benefit_id = excluded.assigned_benefit_id,
-            note = excluded.note,
-            labeled_at = excluded.labeled_at
-        """,
-        (transaction_id, assigned_benefit_id, note, datetime.now().isoformat()),
-    )
-    conn.commit()

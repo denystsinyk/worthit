@@ -7,9 +7,15 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+  {% if demo_mode %}
+  <div class="banner banner-demo">
+    🔍 <strong>Demo</strong> - this shows mock data only, nothing here is connected to a real bank account.
+    See <a href="https://github.com/denystsinyk/worthit#readme">README.md</a> for instructions to run this
+    yourself with your own Amex account.
+  </div>
+  {% endif %}
   <nav>
     <a href="{{ url_for('dashboard') }}">Dashboard</a>
-    <a href="{{ url_for('triage_view') }}">Review Transactions</a>
   </nav>
   {% with messages = get_flashed_messages() %}
     {% if messages %}

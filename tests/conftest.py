@@ -27,8 +27,6 @@ def make_txn(
     amount=0.0,
     merchant_name=None,
     name=None,
-    matched_benefit_id=None,
-    triage_status="unreviewed",
     account_id="acc1",
     item_id="item1",
     pending=0,
@@ -45,6 +43,4 @@ def make_txn(
         "name": name,
         "pending": pending,
         "raw_json": None,
-        "matched_benefit_id": matched_benefit_id,
-        "triage_status": triage_status,
     }

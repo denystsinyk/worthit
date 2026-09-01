@@ -2,9 +2,6 @@ import sqlite3
 from dataclasses import dataclass
 
 from worthit import models, plaid_client
-from worthit.benefits.loader import load_benefits
-from worthit.benefits.matcher import rematch_all
-from worthit.config import BENEFITS_PATH
 
 
 @dataclass
@@ -31,16 +28,22 @@ def _normalize(txn: dict) -> dict:
 
 
 def run_sync(conn: sqlite3.Connection) -> list[SyncSummary]:
-    """Syncs every linked Item's transactions and re-runs benefit matching.
-    Returns one summary per Item so the dashboard can report per-connection status."""
+    """Syncs every linked Item's transactions. Benefit matching happens live at
+    read-time (worthit.benefits.status), so this just needs to keep the local
+    transaction cache current. Returns one summary per Item so the dashboard
+    can report per-connection status."""
     summaries = []
     for state in models.get_all_sync_states(conn):
         item_id = state["item_id"]
         try:
             result = plaid_client.sync_transactions(state["access_token"], state["cursor"])
         except plaid_client.ItemLoginRequiredError:
-            models.update_sync_progress(conn, item_id, state["cursor"], "ITEM_LOGIN_REQUIRED")
+            models.update_sync_error(conn, item_id, "ITEM_LOGIN_REQUIRED")
             summaries.append(SyncSummary(item_id=item_id, reconnect_required=True, error="ITEM_LOGIN_REQUIRED"))
+            continue
+        except plaid_client.PlaidSyncError as exc:
+            models.update_sync_error(conn, item_id, exc.code)
+            summaries.append(SyncSummary(item_id=item_id, error=exc.code))
             continue
 
         normalized = [_normalize(t) for t in (result.added + result.modified)]
@@ -57,6 +60,4 @@ def run_sync(conn: sqlite3.Connection) -> list[SyncSummary]:
             )
         )
 
-    benefits = load_benefits(BENEFITS_PATH)
-    rematch_all(conn, benefits)
     return summaries

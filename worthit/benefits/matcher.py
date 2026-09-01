@@ -1,7 +1,6 @@
 import sqlite3
 from datetime import date
 
-from worthit import models
 from worthit.benefits.schema import BenefitConfig, MatchRule
 
 
@@ -73,22 +72,3 @@ def compute_used_amount(benefit: BenefitConfig, matched_rows: list[sqlite3.Row])
         total = sum(abs(row["amount"]) for row in matched_rows)
     cap = benefit.amount_cap if benefit.amount_cap is not None else benefit.amount
     return min(total, cap)
-
-
-def rematch_all(conn: sqlite3.Connection, benefits: list[BenefitConfig]) -> None:
-    """Re-runs matching rules against all stored transactions. Skips
-    transactions the user has already manually triaged (labeled or ignored),
-    so a config edit never overwrites an explicit human decision."""
-    rows = models.get_all_transactions(conn)
-    for row in rows:
-        if row["triage_status"] in ("labeled", "ignored"):
-            continue
-        for benefit in benefits:
-            expected_sign_ok = (
-                (benefit.detection_mode == "spend_threshold" and row["amount"] > 0)
-                or (benefit.detection_mode == "credit_match" and row["amount"] < 0)
-            )
-            if expected_sign_ok and rule_matches(benefit.match, row["merchant_name"], row["name"]):
-                if row["matched_benefit_id"] != benefit.id:
-                    models.set_matched_benefit(conn, row["transaction_id"], benefit.id)
-                break

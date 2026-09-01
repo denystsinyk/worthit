@@ -23,6 +23,12 @@ nav a {
   border-color: #ffcf87;
 }
 
+.banner-demo {
+  background: #f0ebfa;
+  border-color: #b39ddb;
+  font-weight: 600;
+}
+
 .flash {
   background: #eafbea;
   border: 1px solid #9adf9a;

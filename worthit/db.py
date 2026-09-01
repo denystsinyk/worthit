@@ -21,16 +21,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     merchant_name TEXT,
     name TEXT,
     pending INTEGER NOT NULL DEFAULT 0,
-    raw_json TEXT,
-    matched_benefit_id TEXT,
-    triage_status TEXT NOT NULL DEFAULT 'unreviewed'
-);
-
-CREATE TABLE IF NOT EXISTS triage_labels (
-    transaction_id TEXT PRIMARY KEY,
-    assigned_benefit_id TEXT,
-    note TEXT,
-    labeled_at TEXT
+    raw_json TEXT
 );
 """
 

@@ -25,6 +25,14 @@ class ItemLoginRequiredError(Exception):
     Amex connections, not an exceptional failure."""
 
 
+class PlaidSyncError(Exception):
+    """A recoverable Plaid or network failure during transaction sync."""
+
+    def __init__(self, code: str):
+        super().__init__(code)
+        self.code = code
+
+
 def _plaid_error_code(exc: ApiException) -> str | None:
     if not exc.body:
         return None
@@ -82,23 +90,46 @@ class SyncResult:
 
 def sync_transactions(access_token: str, cursor: str | None) -> SyncResult:
     client = get_client()
-    added, modified, removed = [], [], []
-    next_cursor = cursor
-    has_more = True
+    original_cursor = cursor
 
-    while has_more:
-        request = TransactionsSyncRequest(access_token=access_token, cursor=next_cursor)
-        try:
-            response = client.transactions_sync(request)
-        except ApiException as exc:
-            if _plaid_error_code(exc) == "ITEM_LOGIN_REQUIRED":
-                raise ItemLoginRequiredError() from exc
-            raise
+    # Plaid can mutate transaction data while a multi-page sync is in flight.
+    # Their required recovery is to discard every page and restart from the
+    # cursor used for page one. Bound the retries so an unhealthy Item cannot
+    # keep a web request open forever.
+    for attempt in range(3):
+        added, modified, removed = [], [], []
+        next_cursor = original_cursor
+        has_more = True
 
-        added.extend(t.to_dict() for t in response.added)
-        modified.extend(t.to_dict() for t in response.modified)
-        removed.extend(t.transaction_id for t in response.removed)
-        next_cursor = response.next_cursor
-        has_more = response.has_more
+        while has_more:
+            request_kwargs = {"access_token": access_token, "count": 500}
+            # The Plaid SDK rejects cursor=None. Initial sync must omit it.
+            if next_cursor is not None:
+                request_kwargs["cursor"] = next_cursor
+            request = TransactionsSyncRequest(**request_kwargs)
+            try:
+                response = client.transactions_sync(request)
+            except ApiException as exc:
+                code = _plaid_error_code(exc) or "PLAID_API_ERROR"
+                if code == "ITEM_LOGIN_REQUIRED":
+                    raise ItemLoginRequiredError() from exc
+                if code == "TRANSACTIONS_SYNC_MUTATION_DURING_PAGINATION":
+                    break
+                raise PlaidSyncError(code) from exc
+            except Exception as exc:
+                raise PlaidSyncError("PLAID_NETWORK_ERROR") from exc
 
-    return SyncResult(added=added, modified=modified, removed=removed, next_cursor=next_cursor)
+            added.extend(t.to_dict() for t in response.added)
+            modified.extend(t.to_dict() for t in response.modified)
+            removed.extend(t.transaction_id for t in response.removed)
+            next_cursor = response.next_cursor
+            has_more = response.has_more
+        else:
+            return SyncResult(
+                added=added,
+                modified=modified,
+                removed=removed,
+                next_cursor=next_cursor,
+            )
+
+    raise PlaidSyncError("TRANSACTIONS_SYNC_MUTATION_DURING_PAGINATION")

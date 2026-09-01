@@ -23,10 +23,10 @@ benefits:
     match:
       merchant_contains: ["UBER"]
     notes: >
-      Amex auto-credits $10/mo once you spend >= $10 at Uber or Uber Eats in
-      the calendar month. This does NOT appear as its own credit transaction
-      in the card feed -- detection is spend-threshold based on total Uber
-      spend, not a credit-match.
+      Amex adds $10/mo to the linked Uber account as Uber Cash; it does not
+      appear as a statement credit in the card feed. For this single-user
+      tracker, eligible Uber/Uber Eats spend is treated as evidence that the
+      Uber Cash was used, based on the cardholder's stated usage pattern.
 
   - id: dining
     label: "Dining Credit"
@@ -34,23 +34,10 @@ benefits:
     amount_cap: 10.00
     period: monthly
     detection_mode: credit_match
+    enrollment_required: true
     match:
       description_contains: ["DINING", "CREDIT"]
-      merchant_credit_pairs:
-        - merchant_contains: ["GRUBHUB"]
-          description_contains: ["CREDIT"]
-        - merchant_contains: ["CHEESECAKE"]
-          description_contains: ["CREDIT"]
-        - merchant_contains: ["FIVE GUYS"]
-          description_contains: ["CREDIT"]
-        - merchant_contains: ["GOLDBELLY"]
-          description_contains: ["CREDIT"]
-    notes: >
-      UNCONFIRMED PATTERN - based on how the Dunkin credit appears
-      ("-7.00 Amex Dunkin Credit"), guessing this shows similarly, e.g.
-      "Amex Dining Credit". Enrolled merchant list can change over time --
-      check the unmatched-credits triage view after your next statement and
-      update these patterns if the real transaction text differs.
+    notes: "Confirmed pattern from real data: '-10.00 AMEX Dining Credit'."
 
   - id: dunkin
     label: "Dunkin' Credit"
@@ -58,9 +45,10 @@ benefits:
     amount_cap: 7.00
     period: monthly
     detection_mode: credit_match
+    enrollment_required: true
     match:
       description_contains: ["DUNKIN", "CREDIT"]
-    notes: "Confirmed pattern from real data: '-7.00 Amex Dunkin Credit'."
+    notes: "Confirmed pattern from real data: \"-7.00 AMEX DUNKIN' CREDIT\"."
 
   - id: resy
     label: "Resy Credit"
@@ -75,10 +63,8 @@ benefits:
     purchase_hint:
       merchant_contains: ["RESY"]
     notes: >
-      UNCONFIRMED PATTERN - you haven't used this credit yet, so the real
-      transaction text is unknown. Also requires one-time manual enrollment
-      via the Benefits section of americanexpress.com. Credits can take up
-      to 8 weeks (56 days) to post after a qualifying purchase, so the
-      dashboard suppresses "at risk" warnings if a Resy purchase happened
-      recently. Update match.description_contains via the triage view once
-      you see the real credit transaction.
+      Confirmed pattern from real data: '-50.00 AMEX RESY CREDIT'. Requires
+      one-time manual enrollment via the Benefits section of americanexpress.com.
+      Credits can take up to 8 weeks (56 days) to post after a qualifying
+      purchase. Purchase hints are best-effort because the charge may show only
+      the restaurant name rather than Resy.
