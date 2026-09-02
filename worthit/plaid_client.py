@@ -6,13 +6,15 @@ from plaid.api import plaid_api
 from plaid.exceptions import ApiException
 from plaid.model.country_code import CountryCode
 from plaid.model.item_public_token_exchange_request import ItemPublicTokenExchangeRequest
+from plaid.model.item_remove_request import ItemRemoveRequest
 from plaid.model.link_token_create_request import LinkTokenCreateRequest
+from plaid.model.link_token_transactions import LinkTokenTransactions
 from plaid.model.link_token_create_request_update import LinkTokenCreateRequestUpdate
 from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
 from plaid.model.products import Products
 from plaid.model.transactions_sync_request import TransactionsSyncRequest
 
-from worthit.config import PLAID_CLIENT_ID, PLAID_ENV, PLAID_SECRET
+from worthit.config import PLAID_CLIENT_ID, PLAID_ENV, PLAID_SECRET, load_settings
 
 CLIENT_NAME = "Amex Benefit Tracker"
 # Single local user - this is a single-player hobby tool, not a multi-tenant app.
@@ -67,6 +69,8 @@ def create_link_token(access_token: str | None = None) -> str:
         kwargs["update"] = LinkTokenCreateRequestUpdate()
     else:
         kwargs["products"] = [Products("transactions")]
+        days = max(1, min(int(load_settings()["transaction_history_days"]), 730))
+        kwargs["transactions"] = LinkTokenTransactions(days_requested=days)
 
     request = LinkTokenCreateRequest(**kwargs)
     response = client.link_token_create(request)
@@ -78,6 +82,16 @@ def exchange_public_token(public_token: str) -> tuple[str, str]:
     request = ItemPublicTokenExchangeRequest(public_token=public_token)
     response = client.item_public_token_exchange(request)
     return response.access_token, response.item_id
+
+
+def remove_item(access_token: str) -> None:
+    client = get_client()
+    try:
+        client.item_remove(ItemRemoveRequest(access_token=access_token))
+    except ApiException as exc:
+        raise PlaidSyncError(_plaid_error_code(exc) or "PLAID_API_ERROR") from exc
+    except Exception as exc:
+        raise PlaidSyncError("PLAID_NETWORK_ERROR") from exc
 
 
 @dataclass

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Analytics | WorthIt{% endblock %}
+{% block content %}
+<section class="analytics-hero">
+  <div>
+    <p class="eyebrow">Card value</p>
+    <h1>Analytics</h1>
+    <p>{{ report.range_label }} · through {{ report.end.strftime('%b %-d, %Y') }}</p>
+  </div>
+  <nav class="range-picker" aria-label="Analytics range">
+    <a href="?range=ytd"{% if report.range_key == 'ytd' %} aria-current="page"{% endif %}>YTD</a>
+    <a href="?range=12m"{% if report.range_key == '12m' %} aria-current="page"{% endif %}>12 months</a>
+    <a href="?range=all"{% if report.range_key == 'all' %} aria-current="page"{% endif %}>All</a>
+  </nav>
+</section>
+
+{% if not linked %}
+<div class="notice notice-primary"><div><strong>No card connected</strong><span>Connect your card to build a history.</span></div><a class="button" href="{{ url_for('link_page') }}">Connect card</a></div>
+{% elif not report.coverage_start %}
+<div class="empty-state"><h2>History is still syncing</h2><p>Return after Plaid finishes the initial transaction update.</p></div>
+{% else %}
+{% if report.range_key == 'ytd' and not report.ytd_complete %}
+<div class="coverage-note"><strong>Partial-year data</strong><span>Transactions begin {{ report.coverage_start.strftime('%b %-d, %Y') }}. Earlier benefits are not counted as missed.</span>{% if not demo_mode %}<a href="{{ url_for('reset_connection') }}">Relink for more history</a>{% endif %}</div>
+{% endif %}
+
+<section class="metric-grid" aria-label="Value summary">
+  <article><span>Value captured</span><strong>${{ "%.2f"|format(report.captured) }}</strong><small>{{ report.range_label }}</small></article>
+  <article><span>Utilization</span><strong>{{ report.utilization }}%</strong><small>${{ "%.0f"|format(report.available) }} observed</small></article>
+  <article><span>Expired unused</span><strong>${{ "%.2f"|format(report.missed) }}</strong><small>completed periods only</small></article>
+  <article><span>Fee recovered</span><strong>{{ report.fee_recovery }}%</strong><small>${{ "%.0f"|format(report.annual_fee) }} annual fee</small></article>
+</section>
+
+<section class="analytics-panel value-history">
+  <div class="panel-heading"><div><p class="eyebrow">Trend</p><h2>Value by month</h2></div>{% if report.best_month %}<p>Best month <strong>{{ report.best_month }}</strong></p>{% endif %}</div>
+  <div class="chart-legend" aria-hidden="true">
+    {% for benefit in benefits %}<span class="series-{{ benefit.id }}"><i></i>{{ benefit.label|replace(' Credit', '') }}</span>{% endfor %}
+  </div>
+  <div class="bar-chart" role="img" aria-label="Recognized benefit value by month">
+    {% for month in report.month_rows %}
+    <div class="bar-column" title="{{ month.label }}: ${{ '%.2f'|format(month.total) }}">
+      <div class="bar-value">{% if month.total %}${{ "%.0f"|format(month.total) }}{% endif %}</div>
+      <div class="bar-stack" style="height: {{ month.percent }}%">
+        {% for benefit in benefits %}{% set value = month.values[benefit.id] %}{% if value %}<span class="series-{{ benefit.id }}" style="flex: {{ value }}"></span>{% endif %}{% endfor %}
+      </div>
+      <span class="bar-label">{{ month.date.strftime('%b') }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="analytics-panel">
+  <div class="panel-heading"><div><p class="eyebrow">Breakdown</p><h2>Benefit performance</h2></div></div>
+  <div class="performance-list">
+    {% for benefit in report.benefit_rows %}
+    <article class="performance-row">
+      <div class="performance-name"><strong>{{ benefit.label }}</strong>{% if benefit.inferred %}<span>Estimated from spend</span>{% else %}<span>Confirmed credits</span>{% endif %}</div>
+      <div class="performance-progress"><span><i style="width: {{ benefit.utilization }}%"></i></span><small>${{ "%.0f"|format(benefit.captured) }} of ${{ "%.0f"|format(benefit.available) }}</small></div>
+      <div class="performance-stat"><strong>{{ benefit.utilization }}%</strong><span>used</span></div>
+      <div class="performance-stat"><strong>{{ benefit.current_streak }} <small>/ {{ benefit.longest_streak }}</small></strong><span>current / best streak</span></div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="value-outlook">
+  <article><span>Annual benefit ceiling</span><strong>${{ "%.0f"|format(report.annual_ceiling) }}</strong><small>from configured benefits</small></article>
+  <article><span>Still available this year</span><strong>${{ "%.0f"|format(report.remaining_this_year) }}</strong><small>current and future periods</small></article>
+  <article><span>Projected annual value</span><strong>{% if report.projected_value is not none %}${{ "%.0f"|format(report.projected_value) }}{% else %}Not enough data{% endif %}</strong><small>estimated from completed periods</small></article>
+</section>
+{% endif %}
+{% endblock %}

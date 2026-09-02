@@ -29,3 +29,55 @@ def test_exchange_token_requires_string_before_live_access(monkeypatch):
     response = app_module.app.test_client().post("/api/exchange-token", json={})
 
     assert response.status_code == 400
+
+
+def test_demo_analytics_page_renders(monkeypatch):
+    app_module = importlib.import_module("app")
+    monkeypatch.setattr(app_module, "DEMO_MODE", True)
+    app_module.app.config.update(TESTING=True)
+
+    response = app_module.app.test_client().get("/analytics?range=12m")
+
+    assert response.status_code == 200
+    assert b"Value by month" in response.data
+    assert b"Benefit performance" in response.data
+
+
+def test_reset_removes_plaid_item_before_local_cache(monkeypatch):
+    app_module = importlib.import_module("app")
+    monkeypatch.setattr(app_module, "DEMO_MODE", False)
+    monkeypatch.setattr(app_module, "get_db", lambda: object())
+    monkeypatch.setattr(
+        app_module.models,
+        "get_sync_state",
+        lambda conn: {"item_id": "item-1", "access_token": "access-1"},
+    )
+    calls = []
+    monkeypatch.setattr(app_module.plaid_client, "remove_item", lambda token: calls.append(("plaid", token)))
+    monkeypatch.setattr(app_module.models, "clear_item", lambda conn, item: calls.append(("local", item)))
+    app_module.app.config.update(TESTING=True, SECRET_KEY="test-secret")
+    client = app_module.app.test_client()
+
+    client.get("/connection/reset")
+    with client.session_transaction() as session:
+        token = session["reset_token"]
+    response = client.post("/connection/reset", data={"reset_token": token})
+
+    assert response.status_code == 302
+    assert calls == [("plaid", "access-1"), ("local", "item-1")]
+
+
+def test_reset_rejects_missing_confirmation(monkeypatch):
+    app_module = importlib.import_module("app")
+    monkeypatch.setattr(app_module, "DEMO_MODE", False)
+    monkeypatch.setattr(app_module, "get_db", lambda: object())
+    monkeypatch.setattr(
+        app_module.models,
+        "get_sync_state",
+        lambda conn: {"item_id": "item-1", "access_token": "access-1"},
+    )
+    app_module.app.config.update(TESTING=True, SECRET_KEY="test-secret")
+
+    response = app_module.app.test_client().post("/connection/reset", data={})
+
+    assert response.status_code == 400

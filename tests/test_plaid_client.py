@@ -58,3 +58,31 @@ def test_sync_restarts_from_original_cursor_after_pagination_mutation():
     assert requests[1].cursor == "page-2"
     assert "cursor" not in requests[2]
     assert result.next_cursor == "cursor-complete"
+
+
+def test_initial_link_requests_configured_transaction_history():
+    client = MagicMock()
+    client.link_token_create.return_value.link_token = "link-token"
+
+    with patch("worthit.plaid_client.get_client", return_value=client), patch(
+        "worthit.plaid_client.load_settings",
+        return_value={"transaction_history_days": 730},
+    ):
+        token = plaid_client.create_link_token()
+
+    request = client.link_token_create.call_args.args[0]
+    assert token == "link-token"
+    assert request.transactions.days_requested == 730
+
+
+def test_remove_item_wraps_network_errors():
+    client = MagicMock()
+    client.item_remove.side_effect = OSError("offline")
+
+    with patch("worthit.plaid_client.get_client", return_value=client):
+        try:
+            plaid_client.remove_item("access-token")
+        except plaid_client.PlaidSyncError as exc:
+            assert exc.code == "PLAID_NETWORK_ERROR"
+        else:
+            raise AssertionError("expected PlaidSyncError")

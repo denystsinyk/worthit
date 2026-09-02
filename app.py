@@ -1,8 +1,10 @@
+import hmac
+import secrets
 from datetime import date, datetime, timedelta
 
-from flask import Flask, flash, g, jsonify, redirect, render_template, request, url_for
+from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for
 
-from worthit import db, demo_data, models, plaid_client, sync
+from worthit import analytics, db, demo_data, models, plaid_client, sync
 from worthit.benefits import status
 from worthit.benefits.loader import load_benefits
 from worthit.benefits.periods import current_period
@@ -87,6 +89,7 @@ def dashboard():
         demo_settings = {**settings, "at_risk_days_semiannual": 200}
         all_txns = demo_data.build_demo_transactions(today)
         statuses = [status.compute_status(b, all_txns, today, demo_settings) for b in benefits]
+        report = analytics.build_report(benefits, all_txns, today, demo_settings, "ytd")
         return render_template(
             "dashboard.html",
             statuses=statuses,
@@ -95,6 +98,7 @@ def dashboard():
             reconnect_needed=False,
             sync_state=None,
             demo_mode=True,
+            analytics_summary=report,
         )
 
     conn = get_db()
@@ -109,6 +113,9 @@ def dashboard():
     lookback_start = _compute_lookback_start(benefits, today)
     all_txns = models.get_transactions(conn, lookback_start, today)
     statuses = [status.compute_status(b, all_txns, today, settings) for b in benefits]
+    report = analytics.build_report(
+        benefits, models.get_all_transactions(conn), today, settings, "ytd"
+    )
 
     return render_template(
         "dashboard.html",
@@ -123,6 +130,26 @@ def dashboard():
             else None
         ),
         demo_mode=False,
+        analytics_summary=report,
+    )
+
+
+@app.route("/analytics")
+def analytics_page():
+    settings = load_settings()
+    today = date.today()
+    benefits = load_benefits(BENEFITS_PATH)
+    range_key = request.args.get("range", "ytd")
+    if DEMO_MODE:
+        transactions = demo_data.build_demo_transactions(today)
+        linked = True
+    else:
+        conn = get_db()
+        linked = bool(models.get_sync_state(conn))
+        transactions = models.get_all_transactions(conn)
+    report = analytics.build_report(benefits, transactions, today, settings, range_key)
+    return render_template(
+        "analytics.html", report=report, benefits=benefits, linked=linked, demo_mode=DEMO_MODE
     )
 
 
@@ -150,6 +177,34 @@ def reauth_page():
         flash(DEMO_DISABLED_MESSAGE)
         return redirect(url_for("dashboard"))
     return render_template("reauth.html")
+
+
+@app.route("/connection/reset", methods=["GET", "POST"])
+def reset_connection():
+    if DEMO_MODE:
+        flash(DEMO_DISABLED_MESSAGE)
+        return redirect(url_for("dashboard"))
+    conn = get_db()
+    state = models.get_sync_state(conn)
+    if not state:
+        return redirect(url_for("link_page"))
+    if request.method == "GET":
+        token = secrets.token_urlsafe(24)
+        session["reset_token"] = token
+        return render_template("reset.html", reset_token=token)
+
+    expected = session.pop("reset_token", "")
+    supplied = request.form.get("reset_token", "")
+    if not expected or not hmac.compare_digest(expected, supplied):
+        return "Invalid or expired confirmation", 400
+    try:
+        plaid_client.remove_item(state["access_token"])
+    except plaid_client.PlaidSyncError as exc:
+        flash(f"Could not remove the Plaid connection: {exc.code}")
+        return redirect(url_for("reset_connection"))
+    models.clear_item(conn, state["item_id"])
+    flash("Connection removed. Link again to request up to two years of history.")
+    return redirect(url_for("link_page"))
 
 
 @app.route("/api/link-token", methods=["POST"])

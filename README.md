@@ -2,7 +2,8 @@
 
 A private dashboard for tracking recurring American Express Gold Card benefits.
 WorthIt reads card transactions through Plaid and shows what has been used,
-what is pending, and what is close to expiring.
+what is pending, what is close to expiring, and how much card value you have
+captured over time.
 
 Tracked benefits:
 
@@ -61,10 +62,15 @@ cp .env.example .env
 ## Configuration
 
 - Benefit amounts and matching rules: `config/benefits.yaml`
-- Sync and warning thresholds: `config/settings.yaml`
+- Annual fee, Plaid history, sync, and warning settings: `config/settings.yaml`
 
 Uber usage is inferred from Uber spending. Dining, Dunkin', and Resy are
 matched from their Amex statement-credit transactions.
+
+New connections request up to two years of Plaid history. Plaid cannot expand
+an existing connection's original history window; use **Analytics → Relink for
+more history** once if an older installation only shows 90 days. This removes
+the current local cache before reconnecting.
 
 ## Test
 

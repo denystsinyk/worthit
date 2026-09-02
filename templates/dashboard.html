@@ -21,6 +21,32 @@
   </div>
 </section>
 
+{% if linked and analytics_summary.coverage_start %}
+<section class="trend-strip" aria-label="Historical summary">
+  <div>
+    <span>{{ analytics_summary.range_label }}</span>
+    <strong>${{ "%.0f"|format(analytics_summary.captured) }}</strong>
+    <small>recognized value</small>
+  </div>
+  <div>
+    <span>Utilization</span>
+    <strong>{{ analytics_summary.utilization }}%</strong>
+    <small>of observed benefits</small>
+  </div>
+  <div>
+    <span>Still available</span>
+    <strong>${{ "%.0f"|format(analytics_summary.remaining_this_year) }}</strong>
+    <small>through December</small>
+  </div>
+  <div>
+    <span>Fee recovered</span>
+    <strong>{{ analytics_summary.fee_recovery }}%</strong>
+    <small>of ${{ "%.0f"|format(analytics_summary.annual_fee) }}</small>
+  </div>
+  <a href="{{ url_for('analytics_page') }}">View analytics <span aria-hidden="true">→</span></a>
+</section>
+{% endif %}
+
 {% if not linked %}
   <div class="notice notice-primary">
     <div><strong>Connect your card</strong><span>WorthIt uses Plaid to read benefit credits.</span></div>

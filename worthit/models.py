@@ -107,3 +107,10 @@ def get_transactions(
 
 def get_all_transactions(conn: sqlite3.Connection) -> list[sqlite3.Row]:
     return conn.execute("SELECT * FROM transactions ORDER BY date").fetchall()
+
+
+def clear_item(conn: sqlite3.Connection, item_id: str) -> None:
+    """Remove one Plaid Item and its cached transactions atomically."""
+    with conn:
+        conn.execute("DELETE FROM transactions WHERE item_id = ?", (item_id,))
+        conn.execute("DELETE FROM sync_state WHERE item_id = ?", (item_id,))

@@ -10,3 +10,10 @@ sync_stale_minutes: 60
 # "at risk" on the dashboard.
 at_risk_days_monthly: 7
 at_risk_days_semiannual: 21
+
+# Used by Analytics for the fee-recovery comparison. Change this if your
+# effective fee differs because of a retention offer or card variant.
+annual_fee: 325
+
+# Plaid applies this only when Transactions is first added to an Item.
+transaction_history_days: 730

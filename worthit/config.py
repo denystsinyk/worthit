@@ -76,6 +76,8 @@ def load_settings() -> dict:
         "sync_stale_minutes": 60,
         "at_risk_days_monthly": 7,
         "at_risk_days_semiannual": 21,
+        "annual_fee": 325,
+        "transaction_history_days": 730,
     }
     if SETTINGS_PATH.exists():
         with open(SETTINGS_PATH) as f:

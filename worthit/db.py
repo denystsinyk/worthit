@@ -23,6 +23,10 @@ CREATE TABLE IF NOT EXISTS transactions (
     pending INTEGER NOT NULL DEFAULT 0,
     raw_json TEXT
 );
+
+CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date);
+CREATE INDEX IF NOT EXISTS idx_transactions_item_date ON transactions(item_id, date);
+CREATE INDEX IF NOT EXISTS idx_transactions_account_date ON transactions(account_id, date);
 """
 
 

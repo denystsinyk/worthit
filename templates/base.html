@@ -20,7 +20,13 @@
       <a class="wordmark" href="{{ url_for('dashboard') }}" aria-label="WorthIt dashboard">
         <span>worth<span class="wordmark-accent">it</span></span>
       </a>
-      <span class="privacy-indicator">{% if demo_mode %}Demo{% else %}Private local instance{% endif %}</span>
+      <div class="header-actions">
+        <nav class="site-nav" aria-label="Primary">
+          <a href="{{ url_for('dashboard') }}"{% if request.endpoint == 'dashboard' %} aria-current="page"{% endif %}>Benefits</a>
+          <a href="{{ url_for('analytics_page') }}"{% if request.endpoint == 'analytics_page' %} aria-current="page"{% endif %}>Analytics</a>
+        </nav>
+        <span class="privacy-indicator">{% if demo_mode %}Demo{% else %}Private local instance{% endif %}</span>
+      </div>
     </header>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
