@@ -26,6 +26,13 @@ def test_demo_dashboard_does_not_touch_database_or_plaid(demo_app):
     assert b"mock data only" in response.data
 
 
+def test_healthcheck_does_not_touch_database_or_plaid(demo_app):
+    response = demo_app.test_client().get("/healthz")
+
+    assert response.status_code == 200
+    assert response.get_json() == {"status": "ok", "mode": "demo"}
+
+
 @pytest.mark.parametrize(
     "path",
     ["/api/link-token", "/api/exchange-token", "/api/reauth-complete"],

@@ -1,0 +1,16 @@
+services:
+  worthit:
+    build: .
+    restart: unless-stopped
+    init: true
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - worthit_data:/app/data
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  worthit_data:

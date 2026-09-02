@@ -7,7 +7,15 @@ from worthit.benefits import status
 from worthit.benefits.loader import load_benefits
 from worthit.benefits.periods import current_period
 from worthit.benefits.schema import BenefitConfig
-from worthit.config import BENEFITS_PATH, DEMO_MODE, FLASK_DEBUG, FLASK_SECRET_KEY, load_settings
+from worthit.config import (
+    BENEFITS_PATH,
+    DEMO_MODE,
+    FLASK_DEBUG,
+    FLASK_SECRET_KEY,
+    PLAID_ENV,
+    load_settings,
+    validate_runtime_config,
+)
 
 app = Flask(__name__)
 app.secret_key = FLASK_SECRET_KEY
@@ -30,6 +38,12 @@ def close_db(exception=None):
     conn = g.pop("db", None)
     if conn is not None:
         conn.close()
+
+
+@app.route("/healthz")
+def healthz():
+    mode = "demo" if DEMO_MODE else PLAID_ENV
+    return jsonify({"status": "ok", "mode": mode})
 
 
 def _is_stale(last_synced_at: str | None, stale_minutes: int) -> bool:
@@ -183,4 +197,5 @@ def api_reauth_complete():
 
 
 if __name__ == "__main__":
+    validate_runtime_config()
     app.run(debug=FLASK_DEBUG)
