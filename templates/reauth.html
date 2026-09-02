@@ -1,14 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Reconnect your card — WorthIt{% endblock %}
+{% block title %}Reconnect card | WorthIt{% endblock %}
 {% block content %}
 <section class="connection-page">
-  <p class="eyebrow">Connection refresh</p>
   <h1>Reconnect your Amex Gold</h1>
-  <p>Amex periodically asks you to authenticate again. This refreshes your existing connection—it won’t create a duplicate.</p>
-  <div class="connection-detail">
-    <span>What changes</span>
-    <strong>Authentication only; your history stays intact</strong>
-  </div>
+  <p>Refresh your Plaid connection. Your existing history stays intact.</p>
   <button class="button button-dark button-large" id="link-button" data-mode="update">Reconnect with Plaid</button>
   <a class="text-link" href="{{ url_for('dashboard') }}">Back to dashboard</a>
 </section>

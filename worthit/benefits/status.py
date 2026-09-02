@@ -59,9 +59,8 @@ def compute_status(
             if pending_purchases:
                 state = "pending"
                 posting_lag_note = (
-                    f"Found {len(pending_purchases)} qualifying purchase(s) in the last "
-                    f"{benefit.posting_lag_days} days — the credit can take that long to post, "
-                    "so this isn't flagged as at-risk yet."
+                    "Recent qualifying purchase found. Credit may take up to "
+                    f"{benefit.posting_lag_days} days to post."
                 )
 
     return BenefitStatus(

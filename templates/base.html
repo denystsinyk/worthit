@@ -3,28 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f4f1e8">
+  <meta name="theme-color" content="#080d16">
   <meta name="description" content="A focused tracker for recurring Amex Gold benefits.">
-  <title>{% block title %}WorthIt — Amex Gold benefit tracker{% endblock %}</title>
+  <title>{% block title %}WorthIt | Amex Gold benefits{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="{% if demo_mode %}is-demo{% endif %}">
   {% if demo_mode %}
   <div class="demo-strip">
-    <span><strong>Demo mode</strong> · mock data only · no bank connected</span>
-    <a href="https://github.com/denystsinyk/worthit#readme">View the project ↗</a>
+    <span><strong>Demo mode</strong> / mock data only</span>
+    <a href="https://github.com/denystsinyk/worthit#readme">GitHub</a>
   </div>
   {% endif %}
   <div class="site-shell">
     <header class="site-header">
       <a class="wordmark" href="{{ url_for('dashboard') }}" aria-label="WorthIt dashboard">
-        <span class="wordmark-mark" aria-hidden="true">W</span>
-        <span>WorthIt</span>
+        <span>worth<span class="wordmark-accent">it</span></span>
       </a>
-      <div class="header-meta">
-        <span class="privacy-indicator">{% if demo_mode %}Demo data{% else %}Private & local{% endif %}</span>
-        <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
-      </div>
+      <span class="privacy-indicator">{% if demo_mode %}Demo{% else %}Private local instance{% endif %}</span>
     </header>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
@@ -36,10 +32,6 @@
     <main>
       {% block content %}{% endblock %}
     </main>
-    <footer class="site-footer">
-      <span>WorthIt · your benefits, made obvious.</span>
-      <span>Financial data stays on this device.</span>
-    </footer>
   </div>
 </body>
 </html>

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Dashboard — WorthIt{% endblock %}
+{% block title %}Dashboard | WorthIt{% endblock %}
 {% block content %}
 {% set state_labels = {
   'complete': 'Used',
@@ -11,80 +11,79 @@
 
 <section class="hero">
   <div class="hero-copy">
-    <p class="eyebrow">Your benefit dashboard</p>
-    <h1>Gold benefits,<br>clearly tracked.</h1>
-    <p class="hero-description">See which recurring credits have posted, what remains, and when each benefit resets.</p>
+    <p class="eyebrow">American Express Gold</p>
+    <h1>Benefit tracker</h1>
   </div>
   <div class="hero-total" aria-label="Recognized benefit value">
-    <p class="metric-label">Recognized this period</p>
-    <p class="hero-amount"><span>$</span>{{ "%.0f"|format(summary.used) }}</p>
-    <p class="metric-footnote">of ${{ "%.0f"|format(summary.available) }} available across current periods</p>
+    <p class="metric-label">Used this period</p>
+    <p class="hero-amount"><span class="currency">$</span><span class="amount">{{ "%.0f"|format(summary.used) }}</span></p>
+    <p class="metric-footnote">${{ "%.0f"|format(summary.available) }} available</p>
   </div>
 </section>
 
 {% if not linked %}
   <div class="notice notice-primary">
-    <div><strong>Your card isn’t connected yet.</strong><span>Link it securely through Plaid to start tracking benefits.</span></div>
+    <div><strong>Connect your card</strong><span>WorthIt uses Plaid to read benefit credits.</span></div>
     <a class="button button-dark" href="{{ url_for('link_page') }}">Connect card</a>
   </div>
 {% elif reconnect_needed %}
   <div class="notice notice-warning">
-    <div><strong>Connection needs attention.</strong><span>Amex is asking you to authenticate again.</span></div>
+    <div><strong>Reconnect Amex</strong><span>Your connection needs authentication.</span></div>
     <a class="button button-dark" href="{{ url_for('reauth_page') }}">Reconnect</a>
   </div>
 {% elif sync_error %}
   <div class="notice notice-warning">
-    <div><strong>Showing your last good sync.</strong><span>Plaid is temporarily unavailable ({{ sync_error }}).</span></div>
+    <div><strong>Sync unavailable</strong><span>Showing cached data. {{ sync_error }}</span></div>
   </div>
 {% endif %}
 
 <section class="benefits-section">
   <div class="section-heading">
-    <div>
-      <p class="section-index">Current benefits</p>
-      <h2>Where things stand</h2>
-    </div>
+    <h2>Current benefits</h2>
     <div class="sync-control">
-      {% if linked and not demo_mode %}
-      <form method="post" action="{{ url_for('force_sync') }}">
-        <button class="button button-quiet" type="submit">Sync now</button>
-      </form>
-      {% endif %}
       {% if sync_state and sync_state['last_synced_at'] %}
-        <span class="last-sync">Updated {{ sync_state['last_synced_at'][:16]|replace('T', ' · ') }}</span>
+        <span class="last-sync">Updated {{ sync_state['last_synced_at'][:16]|replace('T', ' ') }}</span>
       {% elif demo_mode %}
-        <span class="last-sync">Live demo · relative dates</span>
+        <span class="last-sync">Sample data</span>
       {% endif %}
     </div>
-  </div>
-
-  <div class="summary-line" aria-label="Benefit summary">
-    <span><strong>{{ summary.complete }}</strong> of {{ statuses|length }} fully used</span>
-    <span class="summary-divider"></span>
-    <span>{% if summary.attention %}<strong>{{ summary.attention }}</strong> need attention{% else %}Nothing urgent right now{% endif %}</span>
   </div>
 
 <div class="benefit-grid">
   {% for s in statuses %}
   {% set percent = ([((s.amount_used / s.amount_total) * 100), 100]|min) if s.amount_total else 0 %}
   <article class="benefit-card state-{{ s.state }}">
-    <div class="card-topline">
-      <span class="benefit-period">{% if s.benefit.period == 'monthly' %}Monthly{% else %}Semiannual{% endif %}</span>
+    <div class="card-heading">
+      <div class="benefit-identity">
+        <span class="benefit-icon" aria-hidden="true">
+          {% if s.benefit.id == 'uber' %}
+          <img src="{{ url_for('static', filename='icons/car-front.svg') }}" alt="">
+          {% elif s.benefit.id == 'dining' %}
+          <img src="{{ url_for('static', filename='icons/utensils.svg') }}" alt="">
+          {% elif s.benefit.id == 'dunkin' %}
+          <img src="{{ url_for('static', filename='icons/coffee.svg') }}" alt="">
+          {% else %}
+          <img src="{{ url_for('static', filename='icons/concierge-bell.svg') }}" alt="">
+          {% endif %}
+        </span>
+        <div>
+          <h3>{{ s.benefit.label }}</h3>
+          <span class="benefit-period">{% if s.benefit.period == 'monthly' %}Monthly{% else %}Semiannual{% endif %}</span>
+        </div>
+      </div>
       <span class="state-pill">{{ state_labels[s.state] }}</span>
     </div>
     <div class="card-main">
-      <h3>{{ s.benefit.label }}</h3>
       <p class="benefit-value"><span>${{ "%.2f"|format(s.amount_used) }}</span><small> / ${{ "%.2f"|format(s.amount_total) }}</small></p>
       <div class="progress-track" aria-label="{{ '%.0f'|format(percent) }} percent used">
         <span style="width: {{ percent }}%"></span>
       </div>
     </div>
     <div class="card-footer">
-      <span>{{ s.period_start.strftime('%b %-d') }} — {{ s.period_end.strftime('%b %-d') }}</span>
+      <span>{{ s.period_start.strftime('%b %-d') }} to {{ s.period_end.strftime('%b %-d') }}</span>
       <span>{{ s.days_remaining }} days left</span>
     </div>
     {% if s.posting_lag_note %}<p class="card-note">{{ s.posting_lag_note }}</p>{% endif %}
-    {% if s.benefit.enrollment_required %}<p class="enrollment-note">Enrolled benefit</p>{% endif %}
   </article>
   {% endfor %}
 </div>
