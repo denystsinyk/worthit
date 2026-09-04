@@ -169,3 +169,15 @@ def test_sync_time_is_timezone_aware_and_friendly(monkeypatch):
 
     assert formatted["relative"] == "4m ago"
     assert formatted["absolute"].endswith(("EDT", "EST"))
+
+
+def test_demo_status_page_renders_without_private_data(monkeypatch):
+    app_module = importlib.import_module("app")
+    monkeypatch.setattr(app_module, "DEMO_MODE", True)
+    app_module.app.config.update(TESTING=True, SECRET_KEY="test-secret")
+
+    response = app_module.app.test_client().get("/status")
+
+    assert response.status_code == 200
+    assert b"Connection status" in response.data
+    assert b"Sample data" in response.data

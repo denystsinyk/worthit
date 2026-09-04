@@ -109,6 +109,18 @@ def get_all_transactions(conn: sqlite3.Connection) -> list[sqlite3.Row]:
     return conn.execute("SELECT * FROM transactions ORDER BY date").fetchall()
 
 
+def get_transaction_diagnostics(conn: sqlite3.Connection) -> sqlite3.Row:
+    return conn.execute(
+        """
+        SELECT COUNT(*) AS transaction_count,
+               MIN(date) AS coverage_start,
+               MAX(date) AS coverage_end,
+               SUM(CASE WHEN pending = 1 THEN 1 ELSE 0 END) AS pending_count
+        FROM transactions
+        """
+    ).fetchone()
+
+
 def clear_item(conn: sqlite3.Connection, item_id: str) -> None:
     """Remove one Plaid Item and its cached transactions atomically."""
     with conn:

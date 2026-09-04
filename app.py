@@ -190,6 +190,20 @@ def analytics_page():
     )
 
 
+@app.route("/status")
+def status_page():
+    if DEMO_MODE:
+        return render_template("status.html", demo_mode=True, environment="demo", state=None, stats=None)
+    conn = get_db()
+    return render_template(
+        "status.html",
+        demo_mode=False,
+        environment=PLAID_ENV,
+        state=models.get_sync_state(conn),
+        stats=models.get_transaction_diagnostics(conn),
+    )
+
+
 @app.route("/sync", methods=["POST"])
 def force_sync():
     if DEMO_MODE:

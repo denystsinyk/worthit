@@ -314,6 +314,13 @@ button, input, select { font: inherit; }
 .empty-state h2 { margin: 0; font-size: 1.2rem; }
 .empty-state p { margin: 10px 0 0; color: var(--muted); font-size: .75rem; }
 
+.status-page { padding: 72px 0 80px; }
+.status-page h1 { margin: 8px 0 30px; font-size: clamp(2.2rem, 6vw, 4rem); }
+.diagnostic-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.diagnostic-grid article { padding: 20px; display: grid; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+.diagnostic-grid span { color: var(--muted); font-size: .68rem; }
+.diagnostic-grid strong { overflow-wrap: anywhere; font-size: .92rem; }
+
 .connection-page { width: min(620px, 100%); min-height: calc(100vh - 72px); padding: 90px 0; }
 .connection-page h1 { font-size: clamp(2.5rem, 7vw, 4rem); }
 .connection-page > p { max-width: 520px; margin: 22px 0 28px; color: var(--muted); font-size: .86rem; line-height: 1.6; }
@@ -356,6 +363,7 @@ button, input, select { font: inherit; }
   .trend-strip { grid-template-columns: 1fr 1fr; }
   .trend-strip > div:nth-child(4) { display: none; }
   .metric-grid { grid-template-columns: 1fr 1fr; }
+  .diagnostic-grid { grid-template-columns: 1fr; }
   .metric-grid article { padding: 16px; }
   .metric-grid strong { font-size: 1.4rem; }
   .analytics-panel { padding: 19px 15px; }

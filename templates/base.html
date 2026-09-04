@@ -25,6 +25,7 @@
         <nav class="site-nav" aria-label="Primary">
           <a href="{{ url_for('dashboard') }}"{% if request.endpoint == 'dashboard' %} aria-current="page"{% endif %}>Benefits</a>
           <a href="{{ url_for('analytics_page') }}"{% if request.endpoint == 'analytics_page' %} aria-current="page"{% endif %}>Analytics</a>
+          <a href="{{ url_for('status_page') }}"{% if request.endpoint == 'status_page' %} aria-current="page"{% endif %}>Status</a>
         </nav>
         <span class="privacy-indicator">{% if demo_mode %}Demo{% else %}Private local instance{% endif %}</span>
       </div>
