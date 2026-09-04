@@ -87,6 +87,27 @@ the current local cache before reconnecting.
 .venv/bin/python -m pytest
 ```
 
+## Export and backup
+
+Use **Status → Export transactions as CSV** for a portable transaction report.
+The export omits Plaid access tokens and raw API payloads.
+
+For a local install, stop WorthIt before copying `data/worthit-production.db`
+(or `data/worthit-sandbox.db`) to secure storage. Restore by replacing the
+corresponding file while the app is stopped.
+
+For Docker, stop the services and archive the named volume:
+
+```bash
+docker compose stop
+docker run --rm -v worthit_worthit_data:/data -v "$PWD":/backup alpine \
+  tar czf /backup/worthit-backup.tgz -C /data .
+docker compose start
+```
+
+The database contains sensitive financial data and Plaid credentials. Encrypt
+backups and never commit them.
+
 ## Privacy
 
 WorthIt is a single-user, localhost application. Plaid tokens and transactions

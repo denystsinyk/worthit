@@ -1,12 +1,14 @@
+import csv
 import hmac
+import io
 import secrets
 from datetime import date, datetime, timedelta, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, Response, flash, g, jsonify, redirect, render_template, request, session, url_for
 
 from worthit import analytics, db, demo_data, models, plaid_client, sync
-from worthit.benefits import status
+from worthit.benefits import matcher, status
 from worthit.benefits.loader import load_benefits
 from worthit.benefits.periods import current_period
 from worthit.benefits.schema import BenefitConfig
@@ -201,6 +203,38 @@ def status_page():
         environment=PLAID_ENV,
         state=models.get_sync_state(conn),
         stats=models.get_transaction_diagnostics(conn),
+    )
+
+
+@app.route("/export.csv")
+def export_csv():
+    if DEMO_MODE:
+        transactions = demo_data.build_demo_transactions(date.today())
+    else:
+        transactions = models.get_all_transactions(get_db())
+    benefits = load_benefits(BENEFITS_PATH)
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["date", "merchant", "description", "amount", "pending", "matched_benefits"])
+    for transaction in transactions:
+        matched = [
+            benefit.label
+            for benefit in benefits
+            if matcher.rule_matches(benefit.match, transaction["merchant_name"], transaction["name"])
+        ]
+        writer.writerow([
+            transaction["date"],
+            transaction["merchant_name"] or "",
+            transaction["name"] or "",
+            f"{transaction['amount']:.2f}",
+            "yes" if transaction["pending"] else "no",
+            "; ".join(matched),
+
+        ])
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=worthit-transactions.csv"},
     )
 
 

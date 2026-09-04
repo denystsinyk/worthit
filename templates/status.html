@@ -17,5 +17,6 @@
     <article><span>Pending transactions</span><strong>{{ stats['pending_count'] or 0 if stats else 0 }}</strong></article>
     <article><span>Data coverage</span><strong>{% if stats and stats['coverage_start'] %}{{ stats['coverage_start'] }} – {{ stats['coverage_end'] }}{% else %}No data{% endif %}</strong></article>
   </div>
+  <a class="button status-export" href="{{ url_for('export_csv') }}">Export transactions as CSV</a>
 </section>
 {% endblock %}

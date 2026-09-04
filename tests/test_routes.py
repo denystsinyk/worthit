@@ -181,3 +181,17 @@ def test_demo_status_page_renders_without_private_data(monkeypatch):
     assert response.status_code == 200
     assert b"Connection status" in response.data
     assert b"Sample data" in response.data
+
+
+def test_demo_csv_export_has_safe_columns(monkeypatch):
+    app_module = importlib.import_module("app")
+    monkeypatch.setattr(app_module, "DEMO_MODE", True)
+    app_module.app.config.update(TESTING=True)
+
+    response = app_module.app.test_client().get("/export.csv")
+
+    assert response.status_code == 200
+    assert response.mimetype == "text/csv"
+    assert b"matched_benefits" in response.data
+    assert b"access_token" not in response.data
+    assert b"raw_json" not in response.data
