@@ -27,3 +27,11 @@ def test_dashboard_explains_matched_transactions():
 
     assert "Why this amount?" in dashboard
     assert "s.matched_transactions" in dashboard
+
+
+def test_dashboard_exposes_manual_refresh_control():
+    dashboard = (ROOT / "templates" / "dashboard.html").read_text()
+
+    assert 'action="{{ url_for(\'force_sync\') }}"' in dashboard
+    assert "Refresh now" in dashboard
+    assert "refresh.js" in dashboard

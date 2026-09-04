@@ -72,6 +72,11 @@
       {% elif demo_mode %}
         <span class="last-sync">Sample data</span>
       {% endif %}
+      {% if linked and not demo_mode and not reconnect_needed %}
+        <form action="{{ url_for('force_sync') }}" method="post" data-refresh-form>
+          <button class="refresh-button" type="submit" data-refresh-button>Refresh now</button>
+        </form>
+      {% endif %}
     </div>
   </div>
 
@@ -133,4 +138,5 @@
   {% endfor %}
 </div>
 </section>
+<script src="{{ url_for('static', filename='refresh.js') }}"></script>
 {% endblock %}

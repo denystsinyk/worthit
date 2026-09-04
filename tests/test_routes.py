@@ -1,5 +1,7 @@
 import importlib
 
+from worthit.sync import SyncSummary
+
 
 def test_link_token_rejects_invalid_mode_before_live_access(monkeypatch):
     app_module = importlib.import_module("app")
@@ -41,6 +43,25 @@ def test_demo_analytics_page_renders(monkeypatch):
     assert response.status_code == 200
     assert b"Value by month" in response.data
     assert b"Benefit performance" in response.data
+
+
+def test_force_sync_reports_changes_and_returns_to_dashboard(monkeypatch):
+    app_module = importlib.import_module("app")
+    monkeypatch.setattr(app_module, "DEMO_MODE", False)
+    monkeypatch.setattr(app_module, "get_db", lambda: object())
+    monkeypatch.setattr(
+        app_module.sync,
+        "run_sync",
+        lambda conn: [SyncSummary("item-1", added=2, modified=1, removed=3)],
+    )
+    app_module.app.config.update(TESTING=True, SECRET_KEY="test-secret")
+    client = app_module.app.test_client()
+
+    response = client.post("/sync", follow_redirects=False)
+
+    assert response.status_code == 302
+    with client.session_transaction() as session:
+        assert "2 added, 1 updated, 3 removed" in session["_flashes"][0][1]
 
 
 def test_reset_removes_plaid_item_before_local_cache(monkeypatch):

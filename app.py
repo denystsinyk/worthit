@@ -159,7 +159,15 @@ def force_sync():
         flash(DEMO_DISABLED_MESSAGE)
         return redirect(url_for("dashboard"))
     conn = get_db()
-    sync.run_sync(conn)
+    summaries = sync.run_sync(conn)
+    errors = [summary.error for summary in summaries if summary.error]
+    if errors:
+        flash(f"Refresh failed: {', '.join(errors)}")
+    else:
+        added = sum(summary.added for summary in summaries)
+        modified = sum(summary.modified for summary in summaries)
+        removed = sum(summary.removed for summary in summaries)
+        flash(f"Refresh complete: {added} added, {modified} updated, {removed} removed.")
     return redirect(url_for("dashboard"))
 
 
