@@ -68,7 +68,8 @@
     <h2>Current benefits</h2>
     <div class="sync-control">
       {% if sync_state and sync_state['last_synced_at'] %}
-        <span class="last-sync">Updated {{ sync_state['last_synced_at'][:16]|replace('T', ' ') }}</span>
+        {% set sync_time = format_sync_time(sync_state['last_synced_at']) %}
+        <time class="last-sync" datetime="{{ sync_state['last_synced_at'] }}" title="{{ sync_time.absolute }}">Updated {{ sync_time.relative }}</time>
       {% elif demo_mode %}
         <span class="last-sync">Sample data</span>
       {% endif %}

@@ -1,4 +1,5 @@
 import importlib
+from datetime import datetime, timedelta, timezone
 
 from worthit.sync import SyncSummary
 
@@ -157,3 +158,14 @@ def test_mutation_rejects_missing_csrf_token(monkeypatch):
     response = app_module.app.test_client().post("/sync")
 
     assert response.status_code == 403
+
+
+def test_sync_time_is_timezone_aware_and_friendly(monkeypatch):
+    app_module = importlib.import_module("app")
+    monkeypatch.setattr(app_module, "APP_TIMEZONE", "America/New_York")
+    value = (datetime.now(timezone.utc) - timedelta(minutes=4)).isoformat()
+
+    formatted = app_module.format_sync_time(value)
+
+    assert formatted["relative"] == "4m ago"
+    assert formatted["absolute"].endswith(("EDT", "EST"))

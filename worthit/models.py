@@ -1,6 +1,6 @@
 import json
 import sqlite3
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 
 def get_sync_state(conn: sqlite3.Connection) -> sqlite3.Row | None:
@@ -41,7 +41,7 @@ def update_sync_progress(
         SET cursor = ?, last_error = ?, last_synced_at = ?
         WHERE item_id = ?
         """,
-        (cursor, last_error, datetime.now().isoformat(), item_id),
+        (cursor, last_error, datetime.now(timezone.utc).isoformat(), item_id),
     )
     conn.commit()
 

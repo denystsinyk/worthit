@@ -1,6 +1,7 @@
 import hmac
 import secrets
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for
 
@@ -11,6 +12,7 @@ from worthit.benefits.periods import current_period
 from worthit.benefits.schema import BenefitConfig
 from worthit.config import (
     BENEFITS_PATH,
+    APP_TIMEZONE,
     DEMO_MODE,
     FLASK_DEBUG,
     FLASK_SECRET_KEY,
@@ -88,6 +90,30 @@ def _dashboard_summary(statuses) -> dict:
         "complete": sum(s.state == "complete" for s in statuses),
         "attention": sum(s.state == "at_risk" for s in statuses),
     }
+
+
+def format_sync_time(value: str) -> dict[str, str]:
+    parsed = datetime.fromisoformat(value)
+    try:
+        local_zone = ZoneInfo(APP_TIMEZONE)
+    except ZoneInfoNotFoundError:
+        local_zone = timezone.utc
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=local_zone)
+    local = parsed.astimezone(local_zone)
+    seconds = max(0, int((datetime.now(timezone.utc) - parsed.astimezone(timezone.utc)).total_seconds()))
+    if seconds < 60:
+        relative = "just now"
+    elif seconds < 3600:
+        relative = f"{seconds // 60}m ago"
+    elif seconds < 86400:
+        relative = f"{seconds // 3600}h ago"
+    else:
+        relative = f"{seconds // 86400}d ago"
+    return {"relative": relative, "absolute": local.strftime("%b %-d, %Y at %-I:%M %p %Z")}
+
+
+app.jinja_env.globals["format_sync_time"] = format_sync_time
 
 
 @app.route("/")
