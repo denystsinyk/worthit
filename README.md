@@ -43,6 +43,11 @@ Docker Compose runs a companion sync process every 30 minutes so dashboard
 requests remain fast. Set `SYNC_INTERVAL_SECONDS` in `.env` to change the
 interval. The **Refresh now** button is available for an immediate update.
 
+For event-driven updates on a publicly reachable deployment, configure
+`PLAID_WEBHOOK_SECRET` and set `PLAID_WEBHOOK_URL` to the public HTTPS URL
+`https://your-host/api/plaid-webhook/<the-same-secret>` before linking. WorthIt
+handles Plaid's `SYNC_UPDATES_AVAILABLE` event and ignores unrelated events.
+
 Open [http://127.0.0.1:5000](http://127.0.0.1:5000). Once Sandbox works,
 change `PLAID_ENV` to `production` and restart with `docker compose up -d`.
 Each installation must use its own Plaid credentials.

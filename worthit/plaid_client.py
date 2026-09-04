@@ -14,7 +14,7 @@ from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUse
 from plaid.model.products import Products
 from plaid.model.transactions_sync_request import TransactionsSyncRequest
 
-from worthit.config import PLAID_CLIENT_ID, PLAID_ENV, PLAID_SECRET, load_settings
+from worthit.config import PLAID_CLIENT_ID, PLAID_ENV, PLAID_SECRET, PLAID_WEBHOOK_URL, load_settings
 
 CLIENT_NAME = "Amex Benefit Tracker"
 # Single local user - this is a single-player hobby tool, not a multi-tenant app.
@@ -64,6 +64,8 @@ def create_link_token(access_token: str | None = None) -> str:
         country_codes=[CountryCode("US")],
         user=LinkTokenCreateRequestUser(client_user_id=CLIENT_USER_ID),
     )
+    if PLAID_WEBHOOK_URL:
+        kwargs["webhook"] = PLAID_WEBHOOK_URL
     if access_token:
         kwargs["access_token"] = access_token
         kwargs["update"] = LinkTokenCreateRequestUpdate()

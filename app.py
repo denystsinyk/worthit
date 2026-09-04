@@ -15,6 +15,7 @@ from worthit.config import (
     FLASK_DEBUG,
     FLASK_SECRET_KEY,
     PLAID_ENV,
+    PLAID_WEBHOOK_SECRET,
     load_settings,
     validate_runtime_config,
 )
@@ -157,6 +158,25 @@ def force_sync():
         removed = sum(summary.removed for summary in summaries)
         flash(f"Refresh complete: {added} added, {modified} updated, {removed} removed.")
     return redirect(url_for("dashboard"))
+
+
+@app.route("/api/plaid-webhook/<secret>", methods=["POST"])
+def plaid_webhook(secret):
+    if not PLAID_WEBHOOK_SECRET or not hmac.compare_digest(secret, PLAID_WEBHOOK_SECRET):
+        return jsonify({"error": "not found"}), 404
+    payload = request.get_json(silent=True) or {}
+    if (
+        payload.get("webhook_type") != "TRANSACTIONS"
+        or payload.get("webhook_code") != "SYNC_UPDATES_AVAILABLE"
+    ):
+        return jsonify({"status": "ignored"})
+
+    conn = get_db()
+    state = models.get_sync_state(conn)
+    if not state or payload.get("item_id") != state["item_id"]:
+        return jsonify({"error": "unknown item"}), 404
+    sync.run_sync(conn)
+    return jsonify({"status": "synced"})
 
 
 @app.route("/link")

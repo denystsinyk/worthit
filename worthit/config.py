@@ -28,6 +28,8 @@ PLAID_SECRET = os.environ.get(
 )
 FLASK_SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "dev")
 FLASK_DEBUG = _env_flag("FLASK_DEBUG")
+PLAID_WEBHOOK_URL = os.environ.get("PLAID_WEBHOOK_URL", "").strip()
+PLAID_WEBHOOK_SECRET = os.environ.get("PLAID_WEBHOOK_SECRET", "").strip()
 
 # Demo mode never touches the database or Plaid - it renders mock data so the
 # public deployment never has a path to real financial data, even if real

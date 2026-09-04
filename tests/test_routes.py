@@ -64,6 +64,39 @@ def test_force_sync_reports_changes_and_returns_to_dashboard(monkeypatch):
         assert "2 added, 1 updated, 3 removed" in session["_flashes"][0][1]
 
 
+def test_plaid_webhook_syncs_known_item(monkeypatch):
+    app_module = importlib.import_module("app")
+    monkeypatch.setattr(app_module, "PLAID_WEBHOOK_SECRET", "test-webhook-secret")
+    connection = object()
+    monkeypatch.setattr(app_module, "get_db", lambda: connection)
+    monkeypatch.setattr(app_module.models, "get_sync_state", lambda conn: {"item_id": "item-1"})
+    calls = []
+    monkeypatch.setattr(app_module.sync, "run_sync", lambda conn: calls.append(conn))
+    app_module.app.config.update(TESTING=True)
+
+    response = app_module.app.test_client().post(
+        "/api/plaid-webhook/test-webhook-secret",
+        json={
+            "webhook_type": "TRANSACTIONS",
+            "webhook_code": "SYNC_UPDATES_AVAILABLE",
+            "item_id": "item-1",
+        },
+    )
+
+    assert response.status_code == 200
+    assert calls == [connection]
+
+
+def test_plaid_webhook_rejects_wrong_secret(monkeypatch):
+    app_module = importlib.import_module("app")
+    monkeypatch.setattr(app_module, "PLAID_WEBHOOK_SECRET", "right-secret")
+    app_module.app.config.update(TESTING=True)
+
+    response = app_module.app.test_client().post("/api/plaid-webhook/wrong-secret", json={})
+
+    assert response.status_code == 404
+
+
 def test_reset_removes_plaid_item_before_local_cache(monkeypatch):
     app_module = importlib.import_module("app")
     monkeypatch.setattr(app_module, "DEMO_MODE", False)
