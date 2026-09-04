@@ -1,5 +1,7 @@
 # WorthIt
 
+See [CHANGELOG.md](CHANGELOG.md) for recent improvements.
+
 A private dashboard for tracking recurring American Express Gold Card benefits.
 WorthIt reads card transactions through Plaid and shows what has been used,
 what is pending, what is close to expiring, and how much card value you have
