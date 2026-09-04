@@ -45,7 +45,12 @@ def test_demo_plaid_api_routes_are_forbidden(demo_app, path):
 
 @pytest.mark.parametrize("path", ["/link", "/reauth", "/sync"])
 def test_demo_ui_actions_redirect_without_live_access(demo_app, path):
-    method = demo_app.test_client().post if path == "/sync" else demo_app.test_client().get
-    response = method(path)
+    client = demo_app.test_client()
+    if path == "/sync":
+        with client.session_transaction() as session:
+            session["csrf_token"] = "test-csrf-token"
+        response = client.post(path, headers={"X-CSRF-Token": "test-csrf-token"})
+    else:
+        response = client.get(path)
 
     assert response.status_code == 302

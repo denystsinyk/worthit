@@ -29,6 +29,28 @@ DEMO_DISABLED_MESSAGE = (
 )
 
 
+def _csrf_token() -> str:
+    if "csrf_token" not in session:
+        session["csrf_token"] = secrets.token_urlsafe(32)
+    return session["csrf_token"]
+
+
+@app.context_processor
+def inject_csrf_token():
+    return {"csrf_token": _csrf_token}
+
+
+@app.before_request
+def protect_mutations():
+    if request.method != "POST" or request.endpoint == "plaid_webhook":
+        return None
+    expected = session.get("csrf_token", "")
+    supplied = request.form.get("csrf_token", "") or request.headers.get("X-CSRF-Token", "")
+    if not expected or not supplied or not hmac.compare_digest(expected, supplied):
+        return jsonify({"error": "invalid or missing CSRF token"}), 403
+    return None
+
+
 def get_db():
     if "db" not in g:
         g.db = db.get_conn()
