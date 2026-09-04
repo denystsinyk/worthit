@@ -110,6 +110,25 @@
       <span>{{ s.days_remaining }} days left</span>
     </div>
     {% if s.posting_lag_note %}<p class="card-note">{{ s.posting_lag_note }}</p>{% endif %}
+    {% if s.matched_transactions or s.pending_transactions %}
+    <details class="match-details">
+      <summary>Why this amount?</summary>
+      <ul>
+        {% for transaction in s.matched_transactions %}
+        <li>
+          <span>{{ transaction['merchant_name'] or transaction['name'] or 'Transaction' }}</span>
+          <small>{{ transaction['date'] }} · ${{ "%.2f"|format(transaction['amount']|abs) }}{% if transaction['pending'] %} · pending{% endif %}</small>
+        </li>
+        {% endfor %}
+        {% for transaction in s.pending_transactions %}
+        <li>
+          <span>{{ transaction['merchant_name'] or transaction['name'] or 'Qualifying purchase' }}</span>
+          <small>{{ transaction['date'] }} · ${{ "%.2f"|format(transaction['amount']|abs) }} · credit pending</small>
+        </li>
+        {% endfor %}
+      </ul>
+    </details>
+    {% endif %}
   </article>
   {% endfor %}
 </div>
