@@ -10,6 +10,23 @@ def csrf_headers(client):
     return {"X-CSRF-Token": "test-csrf-token"}
 
 
+def configure_live_dashboard(monkeypatch, *, last_error=None):
+    app_module = importlib.import_module("app")
+    monkeypatch.setattr(app_module, "DEMO_MODE", False)
+    connection = object()
+    state = {
+        "item_id": "item-1",
+        "last_synced_at": datetime.now(timezone.utc).isoformat(),
+        "last_error": last_error,
+    }
+    monkeypatch.setattr(app_module, "get_db", lambda: connection)
+    monkeypatch.setattr(app_module.models, "get_sync_state", lambda conn: state)
+    monkeypatch.setattr(app_module.models, "get_transactions", lambda conn, start, end: [])
+    monkeypatch.setattr(app_module.models, "get_all_transactions", lambda conn: [])
+    app_module.app.config.update(TESTING=True, SECRET_KEY="test-secret")
+    return app_module
+
+
 def test_link_token_rejects_invalid_mode_before_live_access(monkeypatch):
     app_module = importlib.import_module("app")
     monkeypatch.setattr(app_module, "DEMO_MODE", False)
@@ -71,6 +88,44 @@ def test_force_sync_reports_changes_and_returns_to_dashboard(monkeypatch):
     assert response.status_code == 302
     with client.session_transaction() as session:
         assert "2 added, 1 updated, 3 removed" in session["_flashes"][0][1]
+
+
+def test_live_dashboard_renders_refresh_button(monkeypatch):
+    app_module = configure_live_dashboard(monkeypatch)
+
+    response = app_module.app.test_client().get("/")
+
+    assert response.status_code == 200
+    assert b"Refresh now" in response.data
+    assert b'action="/sync"' in response.data
+
+
+def test_live_dashboard_renders_sync_error_and_keeps_refresh_available(monkeypatch):
+    app_module = configure_live_dashboard(monkeypatch, last_error="PLAID_NETWORK_ERROR")
+
+    response = app_module.app.test_client().get("/")
+
+    assert b"Sync unavailable" in response.data
+    assert b"PLAID_NETWORK_ERROR" in response.data
+    assert b"Refresh now" in response.data
+
+
+def test_force_sync_flashes_error_code(monkeypatch):
+    app_module = importlib.import_module("app")
+    monkeypatch.setattr(app_module, "DEMO_MODE", False)
+    monkeypatch.setattr(app_module, "get_db", lambda: object())
+    monkeypatch.setattr(
+        app_module.sync,
+        "run_sync",
+        lambda conn: [SyncSummary("item-1", error="PLAID_NETWORK_ERROR")],
+    )
+    app_module.app.config.update(TESTING=True, SECRET_KEY="test-secret")
+    client = app_module.app.test_client()
+
+    client.post("/sync", headers=csrf_headers(client))
+
+    with client.session_transaction() as session:
+        assert "PLAID_NETWORK_ERROR" in session["_flashes"][0][1]
 
 
 def test_plaid_webhook_syncs_known_item(monkeypatch):
