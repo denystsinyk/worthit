@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY --chown=worthit:worthit . .
 RUN mkdir -p /app/data && chown worthit:worthit /app/data \
-    && chmod +x /app/scripts/container_entrypoint.sh
+    && chmod +x /app/scripts/container_entrypoint.sh /app/scripts/sync_loop.sh
 
 USER worthit
 EXPOSE 5000

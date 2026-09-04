@@ -1,6 +1,6 @@
 import hmac
 import secrets
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
 from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for
 
@@ -46,13 +46,6 @@ def close_db(exception=None):
 def healthz():
     mode = "demo" if DEMO_MODE else PLAID_ENV
     return jsonify({"status": "ok", "mode": mode})
-
-
-def _is_stale(last_synced_at: str | None, stale_minutes: int) -> bool:
-    if not last_synced_at:
-        return True
-    last = datetime.fromisoformat(last_synced_at)
-    return (datetime.now() - last) > timedelta(minutes=stale_minutes)
 
 
 def _compute_lookback_start(benefits: list[BenefitConfig], today: date) -> date:
@@ -104,11 +97,6 @@ def dashboard():
     conn = get_db()
     sync_state = models.get_sync_state(conn)
     reconnect_needed = bool(sync_state and sync_state["last_error"] == "ITEM_LOGIN_REQUIRED")
-
-    if sync_state and not reconnect_needed and _is_stale(sync_state["last_synced_at"], settings["sync_stale_minutes"]):
-        sync.run_sync(conn)
-        sync_state = models.get_sync_state(conn)
-        reconnect_needed = bool(sync_state and sync_state["last_error"] == "ITEM_LOGIN_REQUIRED")
 
     lookback_start = _compute_lookback_start(benefits, today)
     all_txns = models.get_transactions(conn, lookback_start, today)

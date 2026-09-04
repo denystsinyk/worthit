@@ -39,6 +39,10 @@ Then run:
 docker compose up --build
 ```
 
+Docker Compose runs a companion sync process every 30 minutes so dashboard
+requests remain fast. Set `SYNC_INTERVAL_SECONDS` in `.env` to change the
+interval. The **Refresh now** button is available for an immediate update.
+
 Open [http://127.0.0.1:5000](http://127.0.0.1:5000). Once Sandbox works,
 change `PLAID_ENV` to `production` and restart with `docker compose up -d`.
 Each installation must use its own Plaid credentials.

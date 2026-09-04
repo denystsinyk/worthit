@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Headless sync entrypoint for cron. Keeps the local transaction cache warm
-so the dashboard doesn't need to make a blocking Plaid call on every page
-load. Optional - the dashboard triggers its own sync when stale, so this is
-purely a freshness booster. Exits non-zero if any linked Item needs
+so the dashboard never needs to make a blocking Plaid call on page load.
+Exits non-zero if any linked Item needs
 reconnecting, so cron failure notifications (if configured) will fire.
 
 Example crontab entry (every 30 minutes):
