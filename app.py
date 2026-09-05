@@ -143,6 +143,7 @@ def dashboard():
             sync_state=None,
             demo_mode=True,
             analytics_summary=report,
+            current_month=today.strftime("%B"),
         )
 
     conn = get_db()
@@ -170,6 +171,7 @@ def dashboard():
         ),
         demo_mode=False,
         analytics_summary=report,
+        current_month=today.strftime("%B"),
     )
 
 

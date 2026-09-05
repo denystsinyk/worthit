@@ -1,5 +1,5 @@
 import importlib
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 from worthit.sync import SyncSummary
 
@@ -98,8 +98,10 @@ def test_live_dashboard_renders_refresh_button(monkeypatch):
     response = app_module.app.test_client().get("/")
 
     assert response.status_code == 200
+    assert f"{date.today():%B} benefits".encode() in response.data
     assert b"Refresh now" in response.data
     assert b'action="/sync"' in response.data
+    assert b"progress-track" not in response.data
 
 
 def test_live_dashboard_renders_sync_error_and_keeps_refresh_available(monkeypatch):

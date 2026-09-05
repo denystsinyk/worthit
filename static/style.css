@@ -200,7 +200,7 @@ button, input, select { font: inherit; }
 .refresh-button:disabled { cursor: wait; opacity: .7; }
 .benefit-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .benefit-card {
-  min-height: 280px;
+  min-height: 240px;
   padding: 22px 22px 24px;
   display: flex;
   flex-direction: column;
@@ -236,12 +236,6 @@ button, input, select { font: inherit; }
 .benefit-value { margin: 0 0 16px; }
 .benefit-value span { font-size: 1.9rem; font-weight: 650; letter-spacing: -.04em; }
 .benefit-value small { color: var(--muted); font-size: .8rem; }
-.progress-track { height: 7px; overflow: hidden; background: #242a34; border-radius: 999px; }
-.progress-track span { height: 100%; display: block; background: var(--gold); border-radius: inherit; }
-.state-complete .progress-track span { background: var(--green); }
-.state-partial .progress-track span { background: var(--amber); }
-.state-at_risk .progress-track span { background: var(--red); }
-.state-pending .progress-track span { background: var(--violet); }
 .card-footer {
   margin-top: 32px;
   padding-top: 13px;

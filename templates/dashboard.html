@@ -65,7 +65,7 @@
 
 <section class="benefits-section">
   <div class="section-heading">
-    <h2>Current benefits</h2>
+    <h2>{{ current_month }} benefits</h2>
     <div class="sync-control">
       {% if sync_state and sync_state['last_synced_at'] %}
         {% set sync_time = format_sync_time(sync_state['last_synced_at']) %}
@@ -84,7 +84,6 @@
 
 <div class="benefit-grid">
   {% for s in statuses %}
-  {% set percent = ([((s.amount_used / s.amount_total) * 100), 100]|min) if s.amount_total else 0 %}
   <article class="benefit-card state-{{ s.state }}">
     <div class="card-heading">
       <div class="benefit-identity">
@@ -107,10 +106,7 @@
       <span class="state-pill">{{ state_labels[s.state] }}</span>
     </div>
     <div class="card-main">
-      <p class="benefit-value"><span>${{ "%.2f"|format(s.amount_used) }}</span><small> / ${{ "%.2f"|format(s.amount_total) }}</small></p>
-      <div class="progress-track" aria-label="{{ '%.0f'|format(percent) }} percent used">
-        <span style="width: {{ percent }}%"></span>
-      </div>
+      <p class="benefit-value"><span>${{ "%.2f"|format(s.amount_used) }}</span><small> of ${{ "%.2f"|format(s.amount_total) }}</small></p>
     </div>
     <div class="card-footer">
       <span>{{ s.period_start.strftime('%b %-d') }} to {{ s.period_end.strftime('%b %-d') }}</span>

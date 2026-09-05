@@ -30,3 +30,10 @@ def test_analytics_separates_spend_chart_from_benefit_activity():
     assert 'class="benefit-matrix"' in analytics
     assert "month.spend_percent" in analytics
     assert ".spend-bar > span" in styles
+
+
+def test_dashboard_uses_month_heading_without_progress_bars():
+    dashboard = (ROOT / "templates" / "dashboard.html").read_text()
+
+    assert "{{ current_month }} benefits" in dashboard
+    assert "progress-track" not in dashboard
