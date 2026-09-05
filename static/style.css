@@ -71,12 +71,12 @@ button, input, select { font: inherit; }
 }
 .demo-strip a { color: var(--gold); font-weight: 650; }
 
-.hero {
-  padding: 64px 0 44px;
-  display: grid;
-  grid-template-columns: 1fr auto;
+.dashboard-heading {
+  padding: 42px 0 24px;
+  display: flex;
   align-items: end;
-  gap: 64px;
+  justify-content: space-between;
+  gap: 32px;
   border-bottom: 1px solid var(--line);
 }
 .eyebrow {
@@ -87,41 +87,16 @@ button, input, select { font: inherit; }
   letter-spacing: .1em;
   text-transform: uppercase;
 }
-.hero h1, .connection-page h1 {
+.dashboard-heading h1, .connection-page h1 {
   margin: 0;
-  font-size: clamp(2.8rem, 5.5vw, 4.3rem);
+  font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 620;
-  letter-spacing: -.06em;
+  letter-spacing: -.045em;
   line-height: 1;
 }
-.hero-total {
-  min-width: 230px;
-  padding: 20px 22px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-.metric-label {
-  margin: 0 0 8px;
-  color: var(--muted);
-  font-size: .68rem;
-  font-weight: 650;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-}
-.hero-amount {
-  margin: 0;
-  display: flex;
-  align-items: baseline;
-  gap: 3px;
-  font-size: 3.35rem;
-  font-weight: 640;
-  letter-spacing: -.07em;
-  line-height: 1;
-}
-.hero-amount .currency { color: var(--gold); font-size: 1.35rem; line-height: 1; }
-.hero-amount .amount { color: var(--text); font-size: 3.35rem; line-height: .85; }
-.metric-footnote { margin: 9px 0 0; color: var(--muted); font-size: .72rem; }
+.dashboard-summary { margin: 12px 0 0; color: var(--muted); font-size: .78rem; }
+.dashboard-summary strong { color: var(--text); font-weight: 650; }
+.dashboard-summary span { margin: 0 5px; color: #4d5562; }
 
 .notice {
   margin-top: 20px;
@@ -158,31 +133,7 @@ button, input, select { font: inherit; }
 .button-danger { color: #fff; background: #9f4145; }
 .button-danger:hover { background: #b74e52; }
 
-.trend-strip {
-  margin-top: 20px;
-  padding: 18px 20px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr) auto;
-  align-items: center;
-  gap: 24px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-.trend-strip > div { display: grid; gap: 3px; }
-.trend-strip span, .trend-strip small { color: var(--muted); font-size: .65rem; }
-.trend-strip strong { font-size: 1.15rem; font-weight: 650; }
-.trend-strip > a { color: var(--gold); font-size: .72rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
-
-.benefits-section { padding: 46px 0 80px; }
-.section-heading {
-  margin-bottom: 18px;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 24px;
-}
-.section-heading h2 { margin: 0; font-size: 1.35rem; font-weight: 650; letter-spacing: -.025em; }
+.benefits-section { padding: 18px 0 12px; }
 .sync-control { display: flex; align-items: center; gap: 10px; }
 .sync-control form { margin: 0; }
 .last-sync { color: var(--muted); font-size: .68rem; }
@@ -200,8 +151,8 @@ button, input, select { font: inherit; }
 .refresh-button:disabled { cursor: wait; opacity: .7; }
 .benefit-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .benefit-card {
-  min-height: 240px;
-  padding: 22px 22px 24px;
+  min-height: 178px;
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
   background: var(--panel);
@@ -232,7 +183,7 @@ button, input, select { font: inherit; }
 .state-partial .state-pill { color: var(--amber); background: var(--amber-soft); }
 .state-at_risk .state-pill { color: var(--red); background: var(--red-soft); }
 .state-pending .state-pill { color: var(--violet); background: var(--violet-soft); }
-.card-main { margin-top: 32px; }
+.card-main { margin-top: 20px; }
 .benefit-value { margin: 0 0 16px; }
 .benefit-value span { font-size: 1.9rem; font-weight: 650; letter-spacing: -.04em; }
 .benefit-value small { color: var(--muted); font-size: .8rem; }
@@ -243,28 +194,39 @@ button, input, select { font: inherit; }
 .state-at_risk .progress-track span { background: var(--red); }
 .state-pending .progress-track span { background: var(--violet); }
 .card-footer {
-  margin-top: 32px;
-  padding-top: 13px;
+  margin-top: auto;
+  padding-top: 11px;
   border-top: 1px solid var(--line);
   color: var(--muted);
   font-size: .66rem;
 }
 .card-note { margin: 12px 0 0; color: #c2b4e9; font-size: .68rem; line-height: 1.45; }
+.dashboard-history {
+  min-height: 52px;
+  padding: 12px 15px;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr auto;
+  align-items: center;
+  gap: 20px;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  font-size: .68rem;
+}
+.dashboard-history p { margin: 0; }
+.dashboard-history strong { color: var(--text); }
+.dashboard-history > span { text-align: center; }
+.dashboard-history a { color: var(--gold); font-weight: 700; text-decoration: none; white-space: nowrap; }
 
 @media (min-width: 761px) and (min-height: 720px) {
   body.page-dashboard { height: 100vh; overflow: hidden; }
   .page-dashboard .site-header { height: 56px; }
-  .page-dashboard .hero { padding: 25px 0 22px; }
-  .page-dashboard .hero h1 { font-size: clamp(2.7rem, 4.5vw, 3.6rem); }
-  .page-dashboard .hero-total { min-width: 190px; padding: 13px 17px; }
-  .page-dashboard .hero-amount,
-  .page-dashboard .hero-amount .amount { font-size: 2.65rem; }
-  .page-dashboard .trend-strip { margin-top: 12px; padding: 11px 16px; }
-  .page-dashboard .benefits-section { padding: 20px 0 0; }
-  .page-dashboard .section-heading { margin-bottom: 10px; }
+  .page-dashboard .dashboard-heading { padding: 28px 0 20px; }
+  .page-dashboard .benefits-section { padding-top: 16px; }
   .page-dashboard .benefit-grid { gap: 10px; }
-  .page-dashboard .benefit-card { min-height: 168px; padding: 16px 18px; }
-  .page-dashboard .card-main { margin-top: 18px; }
+  .page-dashboard .benefit-card { min-height: 165px; padding: 15px 17px; }
+  .page-dashboard .card-main { margin-top: 16px; }
   .page-dashboard .benefit-value { margin-bottom: 12px; }
   .page-dashboard .card-footer { margin-top: auto; padding-top: 10px; }
   .page-dashboard .card-note { margin-top: 7px; }
@@ -360,15 +322,14 @@ button, input, select { font: inherit; }
 @media (max-width: 760px) {
   .site-shell { width: min(100% - 30px, 1080px); }
   .site-header { height: 64px; }
-  .hero { padding: 50px 0 36px; grid-template-columns: 1fr; gap: 30px; }
-  .hero-total { width: 100%; }
+  .dashboard-heading { padding: 40px 0 24px; align-items: flex-start; flex-direction: column; gap: 20px; }
   .benefit-grid { grid-template-columns: 1fr; }
   .notice { align-items: stretch; flex-direction: column; }
   .notice .button { width: 100%; }
   .connection-page { padding: 64px 0; }
   .privacy-indicator { display: none; }
-  .trend-strip { grid-template-columns: repeat(2, 1fr); }
-  .trend-strip > a { grid-column: 1 / -1; }
+  .dashboard-history { grid-template-columns: 1fr auto; }
+  .dashboard-history > span { grid-column: 1 / -1; grid-row: 2; text-align: left; }
   .metric-grid { grid-template-columns: repeat(2, 1fr); }
   .performance-row { grid-template-columns: 1fr auto; gap: 13px; }
   .performance-progress { grid-column: 1 / -1; grid-row: 2; }
@@ -377,8 +338,7 @@ button, input, select { font: inherit; }
 @media (max-width: 480px) {
   .demo-strip { align-items: flex-start; flex-direction: column; gap: 3px; padding: 8px 15px; }
   .privacy-indicator { font-size: .62rem; }
-  .hero h1 { font-size: 2.65rem; }
-  .section-heading { align-items: flex-start; flex-direction: column; gap: 7px; }
+  .dashboard-heading h1 { font-size: 2.4rem; }
   .card-heading { align-items: flex-start; gap: 12px; }
   .card-footer { align-items: flex-start; flex-direction: column; gap: 5px; }
   .connection-page .button-large { width: 100%; }
@@ -389,8 +349,6 @@ button, input, select { font: inherit; }
   .analytics-hero { align-items: flex-start; flex-direction: column; }
   .range-picker { width: 100%; }
   .range-picker a { flex: 1; text-align: center; }
-  .trend-strip { grid-template-columns: 1fr 1fr; }
-  .trend-strip > div:nth-child(4) { display: none; }
   .metric-grid { grid-template-columns: 1fr 1fr; }
   .diagnostic-grid { grid-template-columns: 1fr; }
   .metric-grid article { padding: 16px; }

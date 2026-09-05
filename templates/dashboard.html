@@ -9,43 +9,27 @@
   'pending': 'Credit pending'
 } %}
 
-<section class="hero">
-  <div class="hero-copy">
+<section class="dashboard-heading">
+  <div>
     <p class="eyebrow">American Express Gold</p>
-    <h1>Benefit tracker</h1>
+    <h1>{{ current_month }} benefits</h1>
+    <p class="dashboard-summary"><strong>{{ summary.complete }} of {{ statuses|length }}</strong> used <span>·</span> <strong>${{ "%.0f"|format(summary.used) }} of ${{ "%.0f"|format(summary.available) }}</strong> captured</p>
   </div>
-  <div class="hero-total" aria-label="Recognized benefit value">
-    <p class="metric-label">Used this period</p>
-    <p class="hero-amount"><span class="currency">$</span><span class="amount">{{ "%.0f"|format(summary.used) }}</span></p>
-    <p class="metric-footnote">${{ "%.0f"|format(summary.available) }} available</p>
+  <div class="sync-control">
+    {% if sync_state and sync_state['last_synced_at'] %}
+      {% set sync_time = format_sync_time(sync_state['last_synced_at']) %}
+      <time class="last-sync" datetime="{{ sync_state['last_synced_at'] }}" title="{{ sync_time.absolute }}">Updated {{ sync_time.relative }}</time>
+    {% elif demo_mode %}
+      <span class="last-sync">Sample data</span>
+    {% endif %}
+    {% if linked and not demo_mode and not reconnect_needed %}
+      <form action="{{ url_for('force_sync') }}" method="post" data-refresh-form>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="refresh-button" type="submit" data-refresh-button>Refresh</button>
+      </form>
+    {% endif %}
   </div>
 </section>
-
-{% if linked and analytics_summary.coverage_start %}
-<section class="trend-strip" aria-label="Historical summary">
-  <div>
-    <span>{{ analytics_summary.range_label }}</span>
-    <strong>${{ "%.0f"|format(analytics_summary.captured) }}</strong>
-    <small>recognized value</small>
-  </div>
-  <div>
-    <span>Utilization</span>
-    <strong>{{ analytics_summary.utilization }}%</strong>
-    <small>of observed benefits</small>
-  </div>
-  <div>
-    <span>Still available</span>
-    <strong>${{ "%.0f"|format(analytics_summary.remaining_this_year) }}</strong>
-    <small>through December</small>
-  </div>
-  <div>
-    <span>Fee recovered</span>
-    <strong>{{ analytics_summary.fee_recovery }}%</strong>
-    <small>of ${{ "%.0f"|format(analytics_summary.annual_fee) }}</small>
-  </div>
-  <a href="{{ url_for('analytics_page') }}">View analytics <span aria-hidden="true">→</span></a>
-</section>
-{% endif %}
 
 {% if not linked %}
   <div class="notice notice-primary">
@@ -64,24 +48,6 @@
 {% endif %}
 
 <section class="benefits-section">
-  <div class="section-heading">
-    <h2>{{ current_month }} benefits</h2>
-    <div class="sync-control">
-      {% if sync_state and sync_state['last_synced_at'] %}
-        {% set sync_time = format_sync_time(sync_state['last_synced_at']) %}
-        <time class="last-sync" datetime="{{ sync_state['last_synced_at'] }}" title="{{ sync_time.absolute }}">Updated {{ sync_time.relative }}</time>
-      {% elif demo_mode %}
-        <span class="last-sync">Sample data</span>
-      {% endif %}
-      {% if linked and not demo_mode and not reconnect_needed %}
-        <form action="{{ url_for('force_sync') }}" method="post" data-refresh-form>
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button class="refresh-button" type="submit" data-refresh-button>Refresh now</button>
-        </form>
-      {% endif %}
-    </div>
-  </div>
-
 <div class="benefit-grid">
   {% for s in statuses %}
   {% set percent = ([((s.amount_used / s.amount_total) * 100), 100]|min) if s.amount_total else 0 %}
@@ -121,5 +87,12 @@
   {% endfor %}
 </div>
 </section>
+{% if linked and analytics_summary.coverage_start %}
+<section class="dashboard-history" aria-label="Historical summary">
+  <p><strong>${{ "%.0f"|format(analytics_summary.measured_captured) }}</strong> of <strong>${{ "%.0f"|format(analytics_summary.available) }}</strong> potential captured {{ analytics_summary.range_label|lower }}</p>
+  <span>{{ analytics_summary.utilization }}% utilized · {{ analytics_summary.fee_recovery }}% of annual fee recovered</span>
+  <a href="{{ url_for('analytics_page') }}">Analytics <span aria-hidden="true">→</span></a>
+</section>
+{% endif %}
 <script src="{{ url_for('static', filename='refresh.js') }}"></script>
 {% endblock %}

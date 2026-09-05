@@ -99,12 +99,13 @@ def test_live_dashboard_renders_refresh_button(monkeypatch):
 
     assert response.status_code == 200
     assert f"{date.today():%B} benefits".encode() in response.data
-    assert b"Refresh now" in response.data
+    assert b">Refresh</button>" in response.data
     assert b'action="/sync"' in response.data
     assert b"progress-track" in response.data
     assert b"page-dashboard" in response.data
     assert b"state-pill" in response.data
     assert b"Not used yet" in response.data
+    assert b"hero-total" not in response.data
 
 
 def test_live_dashboard_renders_sync_error_and_keeps_refresh_available(monkeypatch):
@@ -114,7 +115,7 @@ def test_live_dashboard_renders_sync_error_and_keeps_refresh_available(monkeypat
 
     assert b"Sync unavailable" in response.data
     assert b"PLAID_NETWORK_ERROR" in response.data
-    assert b"Refresh now" in response.data
+    assert b">Refresh</button>" in response.data
 
 
 def test_force_sync_flashes_error_code(monkeypatch):
