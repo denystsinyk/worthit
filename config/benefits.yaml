@@ -47,8 +47,11 @@ benefits:
     detection_mode: credit_match
     enrollment_required: true
     match:
-      description_contains: ["DUNKIN", "CREDIT"]
-    notes: "Confirmed pattern from real data: \"-7.00 AMEX DUNKIN' CREDIT\"."
+      description_contains: ["DUNKIN"]
+    notes: >
+      Plaid may label the -$7 statement credit only as "Dunkin' Donuts",
+      without the word "credit". The credit_match mode separately requires a
+      negative amount, so ordinary Dunkin purchases are excluded.
 
   - id: resy
     label: "Resy Credit"

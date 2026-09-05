@@ -49,6 +49,19 @@ def test_confirmed_real_statement_credit_patterns(
     assert matcher.compute_used_amount(benefit, matched) == abs(amount)
 
 
+def test_dunkin_credit_matches_plaid_merchant_only_label(benefit_by_id):
+    dunkin = benefit_by_id["dunkin"]
+    credit = make_txn(merchant_name="Dunkin'", name="Dunkin' Donuts", amount=-7.00)
+    purchase = make_txn(merchant_name="Dunkin'", name="Dunkin' Donuts", amount=7.00)
+
+    matched = matcher.match_transactions(
+        dunkin, [credit, purchase], date(2026, 6, 1), date(2026, 6, 30)
+    )
+
+    assert matched == [credit]
+    assert matcher.compute_used_amount(dunkin, matched) == 7.00
+
+
 def test_statement_credit_benefits_are_marked_as_requiring_enrollment(benefit_by_id):
     assert benefit_by_id["dining"].enrollment_required
     assert benefit_by_id["dunkin"].enrollment_required
