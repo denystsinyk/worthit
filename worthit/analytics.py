@@ -53,7 +53,9 @@ class AnalyticsReport:
     start: date
     end: date
     coverage_start: date | None
+    total_spend: Decimal
     captured: Decimal
+    measured_captured: Decimal
     available: Decimal
     missed: Decimal
     utilization: int
@@ -103,6 +105,12 @@ def build_report(
         month_starts.append(cursor)
         cursor = _next_month(cursor)
     monthly = {month: {b.id: Decimal("0") for b in benefits} for month in month_starts}
+    monthly_spend = {month: Decimal("0") for month in month_starts}
+    for row in transactions:
+        row_date = date.fromisoformat(row["date"])
+        month = row_date.replace(day=1)
+        if month in monthly_spend and row_date <= today and row["amount"] > 0 and not row["pending"]:
+            monthly_spend[month] += _money(row["amount"])
     benefit_totals = {
         b.id: {"captured": Decimal("0"), "measured_captured": Decimal("0"), "available": Decimal("0"), "missed": Decimal("0"), "used_periods": [], "eligible_periods": 0}
         for b in benefits
@@ -175,11 +183,17 @@ def build_report(
     for month in month_starts:
         values = monthly[month]
         total = sum(values.values(), Decimal("0"))
-        month_rows.append({"date": month, "label": month.strftime("%b '%y"), "values": values, "total": total})
-    max_month = max((row["total"] for row in month_rows), default=Decimal("0"))
+        month_rows.append({
+            "date": month,
+            "label": month.strftime("%b '%y"),
+            "values": values,
+            "total": total,
+            "spend": monthly_spend[month],
+        })
+    max_month = max((row["spend"] for row in month_rows), default=Decimal("0"))
     for row in month_rows:
-        row["percent"] = float(row["total"] / max_month * 100) if max_month else 0
-    best = max(month_rows, key=lambda row: row["total"], default=None)
+        row["spend_percent"] = float(row["spend"] / max_month * 100) if max_month else 0
+    best = max(month_rows, key=lambda row: row["spend"], default=None)
 
     benefit_rows = []
     for benefit in benefits:
@@ -209,10 +223,11 @@ def build_report(
 
     return AnalyticsReport(
         range_key=range_key, range_label=range_label, start=start, end=today,
-        coverage_start=coverage_start, captured=captured, available=available,
+        coverage_start=coverage_start, total_spend=sum(monthly_spend.values(), Decimal("0")),
+        captured=captured, measured_captured=measured_captured, available=available,
         missed=missed, utilization=min(utilization, 100), annual_fee=annual_fee,
         fee_recovery=fee_recovery, annual_ceiling=annual_ceiling,
         remaining_this_year=remaining_this_year, projected_value=projected,
-        best_month=best["label"] if best and best["total"] else None,
+        best_month=best["label"] if best and best["spend"] else None,
         month_rows=month_rows, benefit_rows=benefit_rows, ytd_complete=ytd_complete,
     )

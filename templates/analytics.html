@@ -24,31 +24,39 @@
 {% endif %}
 
 <section class="metric-grid" aria-label="Value summary">
-  <article><span>Value captured</span><strong>${{ "%.2f"|format(report.captured) }}</strong><small>{{ report.range_label }}</small></article>
-  <article><span>Utilization</span><strong>{{ report.utilization }}%</strong><small>${{ "%.0f"|format(report.available) }} observed</small></article>
+  <article><span>Card spend</span><strong>${{ "%.2f"|format(report.total_spend) }}</strong><small>{{ report.range_label }} · posted purchases</small></article>
+  <article><span>Benefit value</span><strong>${{ "%.2f"|format(report.measured_captured) }} / ${{ "%.0f"|format(report.available) }}</strong><small>captured / observed potential · {{ report.utilization }}%</small></article>
   <article><span>Expired unused</span><strong>${{ "%.2f"|format(report.missed) }}</strong><small>completed periods only</small></article>
   <article><span>Fee recovered</span><strong>{{ report.fee_recovery }}%</strong><small>${{ "%.0f"|format(report.annual_fee) }} annual fee</small></article>
 </section>
 
 <section class="analytics-panel value-history">
-  <div class="panel-heading"><div><p class="eyebrow">Trend</p><h2>Value by month</h2></div>{% if report.best_month %}<p>Best month <strong>{{ report.best_month }}</strong></p>{% endif %}</div>
-  <div class="chart-legend" aria-hidden="true">
-    {% for benefit in benefits %}<span class="series-{{ benefit.id }}"><i></i>{{ benefit.label|replace(' Credit', '') }}</span>{% endfor %}
-  </div>
-  <div class="bar-chart" role="img" aria-label="Recognized benefit value by month">
+  <div class="panel-heading"><div><p class="eyebrow">Activity</p><h2>Card spend by month</h2></div>{% if report.best_month %}<p>Highest spend <strong>{{ report.best_month }}</strong></p>{% endif %}</div>
+  <div class="bar-chart" role="img" aria-label="Posted card spending by month">
     {% for month in report.month_rows %}
-    <div class="bar-column" title="{{ month.label }}: ${{ '%.2f'|format(month.total) }}">
+    <div class="bar-column" title="{{ month.label }}: ${{ '%.2f'|format(month.spend) }} spent">
       <div class="bar-plot">
-        {% if month.total %}
-        <div class="bar-fill" style="height: {{ month.percent }}%">
-          <div class="bar-value">${{ "%.0f"|format(month.total) }}</div>
-          <div class="bar-stack">
-            {% for benefit in benefits %}{% set value = month['values'][benefit.id] %}{% if value %}<span class="series-{{ benefit.id }}" style="height: {{ (value / month.total * 100)|round(2) }}%"></span>{% endif %}{% endfor %}
-          </div>
+        {% if month.spend %}
+        <div class="spend-bar" style="height: {{ month.spend_percent }}%">
+          <div class="bar-value">${{ "%.0f"|format(month.spend) }}</div>
+          <span></span>
         </div>
         {% endif %}
       </div>
       <span class="bar-label">{{ month.date.strftime('%b') }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="benefit-matrix" aria-label="Benefit use by month">
+    <div class="matrix-row matrix-head"><strong>Benefit activity</strong>{% for benefit in benefits %}<span>{{ benefit.label|replace(' Credit', '')|replace('Uber/Uber Eats', 'Uber') }}</span>{% endfor %}</div>
+    {% for month in report.month_rows %}
+    <div class="matrix-row">
+      <strong>{{ month.date.strftime('%b') }}</strong>
+      {% for benefit in benefits %}
+        {% set value = month['values'][benefit.id] %}
+        {% set cap = benefit.amount_cap if benefit.amount_cap is not none else benefit.amount %}
+        <span class="benefit-check {% if value >= cap %}is-complete{% elif value > 0 %}is-partial{% endif %}" title="{{ benefit.label }}: ${{ '%.2f'|format(value) }} recorded">{% if value >= cap %}✓{% elif value > 0 %}½{% else %}—{% endif %}</span>
+      {% endfor %}
     </div>
     {% endfor %}
   </div>

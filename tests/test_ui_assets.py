@@ -22,11 +22,11 @@ def test_vendored_icon_license_is_present():
     assert "ISC License" in license_text
 
 
-def test_analytics_chart_uses_visible_bar_fill_layout():
+def test_analytics_separates_spend_chart_from_benefit_activity():
     analytics = (ROOT / "templates" / "analytics.html").read_text()
     styles = (ROOT / "static" / "style.css").read_text()
 
-    assert 'class="bar-fill"' in analytics
-    assert "value / month.total * 100" in analytics
-    assert ".bar-stack span" in styles
-    assert ".bar-stack .series-dunkin" in styles
+    assert "Card spend by month" in analytics
+    assert 'class="benefit-matrix"' in analytics
+    assert "month.spend_percent" in analytics
+    assert ".spend-bar > span" in styles

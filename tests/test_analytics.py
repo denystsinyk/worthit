@@ -17,6 +17,8 @@ def test_report_tracks_captured_missed_and_current_value(benefit_by_id):
     report = build_report([uber], rows, date(2026, 3, 15), {"annual_fee": 325})
 
     assert report.captured == Decimal("15.00")
+    assert report.measured_captured == Decimal("15.00")
+    assert report.total_spend == Decimal("16.00")
     assert report.available == Decimal("30.00")
     assert report.missed == Decimal("10.00")
     assert report.utilization == 50
@@ -24,6 +26,9 @@ def test_report_tracks_captured_missed_and_current_value(benefit_by_id):
     assert report.remaining_this_year == Decimal("95.00")
     assert [row["total"] for row in report.month_rows] == [
         Decimal("10.00"), Decimal("0"), Decimal("5.00")
+    ]
+    assert [row["spend"] for row in report.month_rows] == [
+        Decimal("11.00"), Decimal("0"), Decimal("5.00")
     ]
 
 

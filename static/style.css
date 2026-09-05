@@ -278,15 +278,12 @@ button, input, select { font: inherit; }
 .panel-heading h2 { margin: 0; font-size: 1.25rem; font-weight: 650; letter-spacing: -.025em; }
 .panel-heading > p { margin: 0; color: var(--muted); font-size: .68rem; }
 .panel-heading > p strong { color: var(--text); }
-.chart-legend { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 14px; color: var(--muted); font-size: .62rem; }
-.chart-legend span { display: flex; align-items: center; gap: 6px; }
-.chart-legend i { width: 7px; height: 7px; display: block; background: var(--series-color); border-radius: 2px; }
 .series-uber { --series-color: #d3ae67; background: var(--series-color); }
 .series-dining { --series-color: #8caed6; background: var(--series-color); }
 .series-dunkin { --series-color: #c78464; background: var(--series-color); }
 .series-resy { --series-color: #8f82bd; background: var(--series-color); }
 .chart-legend .series-uber, .chart-legend .series-dining, .chart-legend .series-dunkin, .chart-legend .series-resy { background: none; }
-.bar-chart { height: 240px; margin-top: 20px; display: flex; gap: clamp(8px, 2vw, 22px); }
+.bar-chart { height: 230px; margin-top: 24px; display: flex; gap: clamp(8px, 2vw, 22px); }
 .bar-column { height: 100%; min-width: 0; flex: 1; display: grid; grid-template-rows: minmax(0, 1fr) 30px; }
 .bar-plot {
   min-height: 0;
@@ -296,15 +293,20 @@ button, input, select { font: inherit; }
   background: repeating-linear-gradient(to top, transparent 0, transparent calc(25% - 1px), rgba(255,255,255,.045) 25%);
   border-bottom: 1px solid var(--line);
 }
-.bar-fill { width: min(68px, 72%); min-height: 28px; display: flex; flex-direction: column; justify-content: end; }
+.spend-bar { width: min(64px, 68%); min-height: 28px; display: flex; flex-direction: column; justify-content: end; }
 .bar-value { min-height: 19px; color: var(--text); font-size: .62rem; font-weight: 650; text-align: center; }
-.bar-stack { min-height: 9px; flex: 1; display: flex; flex-direction: column-reverse; overflow: hidden; border-radius: 5px 5px 0 0; box-shadow: 0 0 0 1px rgba(255,255,255,.08); }
-.bar-stack span { min-height: 3px; display: block; flex: none; }
-.bar-stack .series-uber { background-color: #d3ae67; }
-.bar-stack .series-dining { background-color: #8caed6; }
-.bar-stack .series-dunkin { background-color: #c78464; }
-.bar-stack .series-resy { background-color: #8f82bd; }
+.spend-bar > span { min-height: 9px; flex: 1; display: block; background: linear-gradient(180deg, #e2c17e, var(--gold)); border-radius: 5px 5px 0 0; }
 .bar-label { height: 28px; padding-top: 9px; color: var(--muted); font-size: .58rem; text-align: center; }
+.benefit-matrix { margin-top: 24px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.matrix-row { min-height: 38px; padding: 0 14px; display: grid; grid-template-columns: minmax(100px, 1.4fr) repeat(4, 1fr); align-items: center; border-top: 1px solid var(--line); }
+.matrix-row:first-child { border-top: 0; }
+.matrix-row strong { font-size: .68rem; }
+.matrix-row > span { color: var(--muted); font-size: .64rem; text-align: center; }
+.matrix-head { min-height: 42px; background: var(--panel-2); }
+.matrix-head > span { font-weight: 650; }
+.matrix-row .benefit-check { font-size: .78rem; }
+.matrix-row .benefit-check.is-complete { color: var(--green); }
+.matrix-row .benefit-check.is-partial { color: var(--amber); }
 .performance-list { margin-top: 16px; }
 .performance-row { padding: 17px 0; display: grid; grid-template-columns: 1.4fr 1.5fr .55fr .7fr; align-items: center; gap: 24px; border-top: 1px solid var(--line); }
 .performance-name, .performance-stat { display: grid; gap: 4px; }
@@ -378,6 +380,9 @@ button, input, select { font: inherit; }
   .bar-chart { height: 220px; gap: 4px; overflow-x: auto; }
   .bar-column { min-width: 26px; }
   .bar-value { display: none; }
+  .matrix-row { padding: 0 8px; grid-template-columns: 58px repeat(4, 1fr); }
+  .matrix-head strong { font-size: 0; }
+  .matrix-head strong::after { content: "Month"; font-size: .62rem; }
   .value-outlook { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
