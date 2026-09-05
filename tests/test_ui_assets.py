@@ -41,5 +41,6 @@ def test_dashboard_uses_month_heading_and_progress_bars():
     assert "state_symbols" not in dashboard
     assert "summary-stat" in dashboard
     assert "dashboard-history" not in dashboard
+    assert "background: var(--panel);\n  border: 1px solid var(--line);\n  border-radius: 6px;" not in styles
     assert "hero-total" not in dashboard
     assert "body.page-dashboard { height: 100vh; overflow: hidden; }" in styles
