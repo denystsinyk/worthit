@@ -3,10 +3,17 @@
 {% block content %}
 {% set state_labels = {
   'complete': 'Used',
-  'partial': 'In progress',
-  'none': 'Not used yet',
+  'partial': 'Partial',
+  'none': 'Not used',
   'at_risk': 'Use soon',
-  'pending': 'Credit pending'
+  'pending': 'Pending'
+} %}
+{% set state_symbols = {
+  'complete': '✓',
+  'partial': '◐',
+  'none': '○',
+  'at_risk': '!',
+  'pending': '◷'
 } %}
 
 <section class="hero">
@@ -103,7 +110,10 @@
           <span class="benefit-period">{% if s.benefit.period == 'monthly' %}Monthly{% else %}Semiannual{% endif %}</span>
         </div>
       </div>
-      <span class="state-pill">{{ state_labels[s.state] }}</span>
+      <span class="state-indicator">
+        <span class="state-symbol" aria-hidden="true">{{ state_symbols[s.state] }}</span>
+        <span>{{ state_labels[s.state] }}</span>
+      </span>
     </div>
     <div class="card-main">
       <p class="benefit-value"><span>${{ "%.2f"|format(s.amount_used) }}</span><small> of ${{ "%.2f"|format(s.amount_total) }}</small></p>

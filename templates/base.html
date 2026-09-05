@@ -9,7 +9,7 @@
   <title>{% block title %}WorthIt | Amex Gold benefits{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body class="{% if demo_mode %}is-demo{% endif %}">
+<body class="{% if demo_mode %}is-demo {% endif %}{% if request.endpoint == 'dashboard' %}page-dashboard{% endif %}">
   {% if demo_mode %}
   <div class="demo-strip">
     <span><strong>Demo mode</strong> / mock data only</span>

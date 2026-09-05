@@ -206,6 +206,7 @@ button, input, select { font: inherit; }
   flex-direction: column;
   background: var(--panel);
   border: 1px solid var(--line);
+  border-left: 3px solid var(--line);
   border-radius: 8px;
 }
 .card-heading, .card-footer { display: flex; align-items: center; justify-content: space-between; }
@@ -219,19 +220,43 @@ button, input, select { font: inherit; }
 .benefit-icon img { width: 24px; height: 24px; display: block; }
 .benefit-identity h3 { margin: 0 0 7px; font-size: 1.08rem; font-weight: 620; letter-spacing: -.02em; }
 .benefit-period { color: var(--muted); font-size: .62rem; font-weight: 500; line-height: 1.5; text-transform: uppercase; letter-spacing: .09em; }
-.state-pill {
-  padding: 6px 9px;
+.state-indicator {
+  min-width: 92px;
+  padding: 5px 9px 5px 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: var(--muted);
   background: var(--panel-2);
-  border-radius: 999px;
+  border: 1px solid #333b47;
+  border-radius: 6px;
   font-size: .65rem;
   font-weight: 700;
   white-space: nowrap;
 }
-.state-complete .state-pill { color: var(--green); background: var(--green-soft); }
-.state-partial .state-pill { color: var(--amber); background: var(--amber-soft); }
-.state-at_risk .state-pill { color: var(--red); background: var(--red-soft); }
-.state-pending .state-pill { color: var(--violet); background: var(--violet-soft); }
+.state-symbol {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  color: var(--text);
+  background: #252c36;
+  border-radius: 4px;
+  font-size: .75rem;
+  line-height: 1;
+}
+.state-complete { border-left-color: var(--green); }
+.state-complete .state-indicator { color: var(--green); background: var(--green-soft); border-color: #28513f; }
+.state-complete .state-symbol { color: #07150f; background: var(--green); }
+.state-partial { border-left-color: var(--amber); }
+.state-partial .state-indicator { color: var(--amber); background: var(--amber-soft); border-color: #5a4528; }
+.state-partial .state-symbol { color: #1a1004; background: var(--amber); }
+.state-at_risk { border-left-color: var(--red); }
+.state-at_risk .state-indicator { color: var(--red); background: var(--red-soft); border-color: #633134; }
+.state-at_risk .state-symbol { color: #1e0708; background: var(--red); }
+.state-pending { border-left-color: var(--violet); }
+.state-pending .state-indicator { color: var(--violet); background: var(--violet-soft); border-color: #50446c; }
+.state-pending .state-symbol { color: #130d20; background: var(--violet); }
 .card-main { margin-top: 32px; }
 .benefit-value { margin: 0 0 16px; }
 .benefit-value span { font-size: 1.9rem; font-weight: 650; letter-spacing: -.04em; }
@@ -244,6 +269,25 @@ button, input, select { font: inherit; }
   font-size: .66rem;
 }
 .card-note { margin: 12px 0 0; color: #c2b4e9; font-size: .68rem; line-height: 1.45; }
+
+@media (min-width: 761px) and (min-height: 720px) {
+  body.page-dashboard { height: 100vh; overflow: hidden; }
+  .page-dashboard .site-header { height: 56px; }
+  .page-dashboard .hero { padding: 25px 0 22px; }
+  .page-dashboard .hero h1 { font-size: clamp(2.7rem, 4.5vw, 3.6rem); }
+  .page-dashboard .hero-total { min-width: 190px; padding: 13px 17px; }
+  .page-dashboard .hero-amount,
+  .page-dashboard .hero-amount .amount { font-size: 2.65rem; }
+  .page-dashboard .trend-strip { margin-top: 12px; padding: 11px 16px; }
+  .page-dashboard .benefits-section { padding: 20px 0 0; }
+  .page-dashboard .section-heading { margin-bottom: 10px; }
+  .page-dashboard .benefit-grid { gap: 10px; }
+  .page-dashboard .benefit-card { min-height: 168px; padding: 16px 18px; }
+  .page-dashboard .card-main { margin-top: 18px; }
+  .page-dashboard .benefit-value { margin: 0; }
+  .page-dashboard .card-footer { margin-top: auto; padding-top: 10px; }
+  .page-dashboard .card-note { margin-top: 7px; }
+}
 
 .analytics-hero {
   padding: 60px 0 34px;

@@ -102,6 +102,9 @@ def test_live_dashboard_renders_refresh_button(monkeypatch):
     assert b"Refresh now" in response.data
     assert b'action="/sync"' in response.data
     assert b"progress-track" not in response.data
+    assert b"page-dashboard" in response.data
+    assert b"state-indicator" in response.data
+    assert b"Not used" in response.data
 
 
 def test_live_dashboard_renders_sync_error_and_keeps_refresh_available(monkeypatch):
