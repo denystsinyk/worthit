@@ -27,6 +27,6 @@ def test_analytics_chart_uses_visible_bar_fill_layout():
     styles = (ROOT / "static" / "style.css").read_text()
 
     assert 'class="bar-fill"' in analytics
-    assert "--bar-value:" in analytics
+    assert "value / month.total * 100" in analytics
     assert ".bar-stack span" in styles
-    assert "flex: var(--bar-value)" in styles
+    assert ".bar-stack .series-dunkin" in styles

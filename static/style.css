@@ -299,7 +299,11 @@ button, input, select { font: inherit; }
 .bar-fill { width: min(68px, 72%); min-height: 28px; display: flex; flex-direction: column; justify-content: end; }
 .bar-value { min-height: 19px; color: var(--text); font-size: .62rem; font-weight: 650; text-align: center; }
 .bar-stack { min-height: 9px; flex: 1; display: flex; flex-direction: column-reverse; overflow: hidden; border-radius: 5px 5px 0 0; box-shadow: 0 0 0 1px rgba(255,255,255,.08); }
-.bar-stack span { min-height: 3px; display: block; flex: var(--bar-value) 1 0; }
+.bar-stack span { min-height: 3px; display: block; flex: none; }
+.bar-stack .series-uber { background-color: #d3ae67; }
+.bar-stack .series-dining { background-color: #8caed6; }
+.bar-stack .series-dunkin { background-color: #c78464; }
+.bar-stack .series-resy { background-color: #8f82bd; }
 .bar-label { height: 28px; padding-top: 9px; color: var(--muted); font-size: .58rem; text-align: center; }
 .performance-list { margin-top: 16px; }
 .performance-row { padding: 17px 0; display: grid; grid-template-columns: 1.4fr 1.5fr .55fr .7fr; align-items: center; gap: 24px; border-top: 1px solid var(--line); }

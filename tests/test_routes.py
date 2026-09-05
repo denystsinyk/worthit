@@ -69,6 +69,8 @@ def test_demo_analytics_page_renders(monkeypatch):
     assert response.status_code == 200
     assert b"Value by month" in response.data
     assert b"Benefit performance" in response.data
+    assert b'class="bar-stack"' in response.data
+    assert b'class="series-uber" style="height:' in response.data
 
 
 def test_force_sync_reports_changes_and_returns_to_dashboard(monkeypatch):
