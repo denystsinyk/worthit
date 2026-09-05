@@ -38,9 +38,15 @@
   <div class="bar-chart" role="img" aria-label="Recognized benefit value by month">
     {% for month in report.month_rows %}
     <div class="bar-column" title="{{ month.label }}: ${{ '%.2f'|format(month.total) }}">
-      <div class="bar-value">{% if month.total %}${{ "%.0f"|format(month.total) }}{% endif %}</div>
-      <div class="bar-stack" style="height: {{ month.percent }}%">
-        {% for benefit in benefits %}{% set value = month.values[benefit.id] %}{% if value %}<span class="series-{{ benefit.id }}" style="flex: {{ value }}"></span>{% endif %}{% endfor %}
+      <div class="bar-plot">
+        {% if month.total %}
+        <div class="bar-fill" style="height: {{ month.percent }}%">
+          <div class="bar-value">${{ "%.0f"|format(month.total) }}</div>
+          <div class="bar-stack">
+            {% for benefit in benefits %}{% set value = month.values[benefit.id] %}{% if value %}<span class="series-{{ benefit.id }}" style="--bar-value: {{ value }}"></span>{% endif %}{% endfor %}
+          </div>
+        </div>
+        {% endif %}
       </div>
       <span class="bar-label">{{ month.date.strftime('%b') }}</span>
     </div>

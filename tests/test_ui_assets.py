@@ -20,3 +20,13 @@ def test_vendored_icon_license_is_present():
     license_text = (ROOT / "static" / "icons" / "LICENSE").read_text()
     assert "Lucide Icons and Contributors" in license_text
     assert "ISC License" in license_text
+
+
+def test_analytics_chart_uses_visible_bar_fill_layout():
+    analytics = (ROOT / "templates" / "analytics.html").read_text()
+    styles = (ROOT / "static" / "style.css").read_text()
+
+    assert 'class="bar-fill"' in analytics
+    assert "--bar-value:" in analytics
+    assert ".bar-stack span" in styles
+    assert "flex: var(--bar-value)" in styles
