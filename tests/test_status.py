@@ -20,7 +20,6 @@ def test_partial_state(benefit_by_id):
     result = status.compute_status(dining, [txn], date(2026, 6, 15), SETTINGS)
     assert result.state == "partial"
     assert result.amount_used == 4.00
-    assert result.matched_transactions == [txn]
 
 
 def test_none_state_when_plenty_of_time_left(benefit_by_id):
@@ -50,7 +49,6 @@ def test_resy_pending_suppresses_at_risk_when_purchase_recent(benefit_by_id):
     result = status.compute_status(resy, [purchase], date(2026, 6, 15), SETTINGS)
     assert result.state == "pending"
     assert result.posting_lag_note is not None
-    assert result.pending_transactions == [purchase]
 
 
 def test_resy_at_risk_without_recent_purchase(benefit_by_id):

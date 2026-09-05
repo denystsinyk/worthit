@@ -208,12 +208,6 @@ button, input, select { font: inherit; }
   border: 1px solid var(--line);
   border-radius: 8px;
 }
-.match-details { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
-.match-details summary { color: var(--gold); cursor: pointer; font-size: .7rem; font-weight: 700; }
-.match-details ul { margin: 10px 0 0; padding: 0; display: grid; gap: 8px; list-style: none; }
-.match-details li { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.match-details li span { font-size: .72rem; }
-.match-details li small { color: var(--muted); font-size: .65rem; text-align: right; }
 .card-heading, .card-footer { display: flex; align-items: center; justify-content: space-between; }
 .benefit-identity { display: flex; align-items: center; gap: 13px; }
 .benefit-icon {

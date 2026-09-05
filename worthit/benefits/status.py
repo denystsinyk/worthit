@@ -23,8 +23,6 @@ class BenefitStatus:
     state: State
     days_remaining: int
     posting_lag_note: str | None = None
-    matched_transactions: list[sqlite3.Row] | None = None
-    pending_transactions: list[sqlite3.Row] | None = None
 
 
 def compute_status(
@@ -75,6 +73,4 @@ def compute_status(
         state=state,
         days_remaining=days_left,
         posting_lag_note=posting_lag_note,
-        matched_transactions=matched,
-        pending_transactions=pending_purchases,
     )
