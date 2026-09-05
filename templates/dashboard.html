@@ -13,15 +13,15 @@
   <div>
     <p class="eyebrow">American Express Gold</p>
     <h1>{{ current_month }} benefits</h1>
-    <div class="dashboard-summary" aria-label="Monthly benefit summary">
-      <div class="summary-stat">
-        <strong>{{ summary.complete }} <span>of {{ statuses|length }}</span></strong>
-        <small>Benefits used</small>
-      </div>
-      <div class="summary-stat summary-value">
-        <strong>${{ "%.0f"|format(summary.used) }} <span>of ${{ "%.0f"|format(summary.available) }}</span></strong>
-        <small>Value captured</small>
-      </div>
+  </div>
+  <div class="dashboard-summary" aria-label="Monthly benefit summary">
+    <div class="summary-stat">
+      <strong>{{ summary.complete }} <span>of {{ statuses|length }}</span></strong>
+      <small>Benefits used</small>
+    </div>
+    <div class="summary-stat summary-value">
+      <strong>${{ "%.0f"|format(summary.used) }} <span>of ${{ "%.0f"|format(summary.available) }}</span></strong>
+      <small>Value captured</small>
     </div>
   </div>
   <div class="sync-control">
