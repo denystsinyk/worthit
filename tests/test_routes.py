@@ -101,10 +101,10 @@ def test_live_dashboard_renders_refresh_button(monkeypatch):
     assert f"{date.today():%B} benefits".encode() in response.data
     assert b"Refresh now" in response.data
     assert b'action="/sync"' in response.data
-    assert b"progress-track" not in response.data
+    assert b"progress-track" in response.data
     assert b"page-dashboard" in response.data
-    assert b"state-indicator" in response.data
-    assert b"Not used" in response.data
+    assert b"state-pill" in response.data
+    assert b"Not used yet" in response.data
 
 
 def test_live_dashboard_renders_sync_error_and_keeps_refresh_available(monkeypatch):

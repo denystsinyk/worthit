@@ -3,17 +3,10 @@
 {% block content %}
 {% set state_labels = {
   'complete': 'Used',
-  'partial': 'Partial',
-  'none': 'Not used',
+  'partial': 'In progress',
+  'none': 'Not used yet',
   'at_risk': 'Use soon',
-  'pending': 'Pending'
-} %}
-{% set state_symbols = {
-  'complete': '✓',
-  'partial': '◐',
-  'none': '○',
-  'at_risk': '!',
-  'pending': '◷'
+  'pending': 'Credit pending'
 } %}
 
 <section class="hero">
@@ -91,6 +84,7 @@
 
 <div class="benefit-grid">
   {% for s in statuses %}
+  {% set percent = ([((s.amount_used / s.amount_total) * 100), 100]|min) if s.amount_total else 0 %}
   <article class="benefit-card state-{{ s.state }}">
     <div class="card-heading">
       <div class="benefit-identity">
@@ -110,13 +104,13 @@
           <span class="benefit-period">{% if s.benefit.period == 'monthly' %}Monthly{% else %}Semiannual{% endif %}</span>
         </div>
       </div>
-      <span class="state-indicator">
-        <span class="state-symbol" aria-hidden="true">{{ state_symbols[s.state] }}</span>
-        <span>{{ state_labels[s.state] }}</span>
-      </span>
+      <span class="state-pill">{{ state_labels[s.state] }}</span>
     </div>
     <div class="card-main">
       <p class="benefit-value"><span>${{ "%.2f"|format(s.amount_used) }}</span><small> of ${{ "%.2f"|format(s.amount_total) }}</small></p>
+      <div class="progress-track" aria-label="{{ '%.0f'|format(percent) }} percent used">
+        <span style="width: {{ percent }}%"></span>
+      </div>
     </div>
     <div class="card-footer">
       <span>{{ s.period_start.strftime('%b %-d') }} to {{ s.period_end.strftime('%b %-d') }}</span>

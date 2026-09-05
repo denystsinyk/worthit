@@ -32,11 +32,11 @@ def test_analytics_separates_spend_chart_from_benefit_activity():
     assert ".spend-bar > span" in styles
 
 
-def test_dashboard_uses_month_heading_without_progress_bars():
+def test_dashboard_uses_month_heading_and_progress_bars():
     dashboard = (ROOT / "templates" / "dashboard.html").read_text()
     styles = (ROOT / "static" / "style.css").read_text()
 
     assert "{{ current_month }} benefits" in dashboard
-    assert "progress-track" not in dashboard
-    assert "state_symbols" in dashboard
+    assert "progress-track" in dashboard
+    assert "state_symbols" not in dashboard
     assert "body.page-dashboard { height: 100vh; overflow: hidden; }" in styles
