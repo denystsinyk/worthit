@@ -88,8 +88,9 @@ def test_force_sync_reports_changes_and_returns_to_dashboard(monkeypatch):
     response = client.post("/sync", headers=csrf_headers(client), follow_redirects=False)
 
     assert response.status_code == 302
+    assert response.headers["Location"] == "/?refreshed=1"
     with client.session_transaction() as session:
-        assert "2 added, 1 updated, 3 removed" in session["_flashes"][0][1]
+        assert "_flashes" not in session
 
 
 def test_live_dashboard_renders_refresh_button(monkeypatch):
@@ -99,7 +100,7 @@ def test_live_dashboard_renders_refresh_button(monkeypatch):
 
     assert response.status_code == 200
     assert f"{date.today():%B} benefits".encode() in response.data
-    assert b">Refresh</button>" in response.data
+    assert b'aria-label="Refresh data"' in response.data
     assert b'action="/sync"' in response.data
     assert b"progress-track" in response.data
     assert b"page-dashboard" in response.data
@@ -118,7 +119,7 @@ def test_live_dashboard_renders_sync_error_and_keeps_refresh_available(monkeypat
 
     assert b"Sync unavailable" in response.data
     assert b"PLAID_NETWORK_ERROR" in response.data
-    assert b">Refresh</button>" in response.data
+    assert b'aria-label="Refresh data"' in response.data
 
 
 def test_force_sync_flashes_error_code(monkeypatch):

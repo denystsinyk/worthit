@@ -3,7 +3,7 @@ from xml.etree import ElementTree
 
 
 ROOT = Path(__file__).resolve().parent.parent
-ICON_NAMES = ("car-front", "utensils", "coffee", "concierge-bell")
+ICON_NAMES = ("car-front", "utensils", "coffee", "concierge-bell", "refresh-cw")
 
 
 def test_benefit_icons_share_one_lucide_visual_system():
@@ -44,3 +44,5 @@ def test_dashboard_uses_month_heading_and_progress_bars():
     assert "background: var(--panel);\n  border: 1px solid var(--line);\n  border-radius: 6px;" not in styles
     assert "hero-total" not in dashboard
     assert "body.page-dashboard { height: 100vh; overflow: hidden; }" in styles
+    assert "refresh-cw.svg" in dashboard
+    assert "is-refreshing" in (ROOT / "static" / "refresh.js").read_text()

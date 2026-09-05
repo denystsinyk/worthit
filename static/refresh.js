@@ -5,6 +5,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("submit", () => {
     button.disabled = true;
-    button.textContent = "Refreshing…";
+    button.classList.add("is-refreshing");
+    button.setAttribute("aria-label", "Refreshing data");
+    button.title = "Refreshing data";
   });
+
+  if (button.classList.contains("is-complete")) {
+    button.setAttribute("aria-label", "Refresh complete");
+    button.title = "Refresh complete";
+    window.setTimeout(() => {
+      button.classList.remove("is-complete");
+      button.setAttribute("aria-label", "Refresh data");
+      button.title = "Refresh data";
+      window.history.replaceState({}, "", window.location.pathname);
+    }, 1800);
+  }
 });

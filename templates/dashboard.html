@@ -34,7 +34,10 @@
     {% if linked and not demo_mode and not reconnect_needed %}
       <form action="{{ url_for('force_sync') }}" method="post" data-refresh-form>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button class="refresh-button" type="submit" data-refresh-button>Refresh</button>
+        <button class="refresh-button{% if request.args.get('refreshed') == '1' %} is-complete{% endif %}" type="submit" data-refresh-button aria-label="Refresh data" title="Refresh data">
+          <img src="{{ url_for('static', filename='icons/refresh-cw.svg') }}" alt="">
+          <span class="sr-only">Refresh data</span>
+        </button>
       </form>
     {% endif %}
   </div>
