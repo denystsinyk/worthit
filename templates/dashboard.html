@@ -13,7 +13,16 @@
   <div>
     <p class="eyebrow">American Express Gold</p>
     <h1>{{ current_month }} benefits</h1>
-    <p class="dashboard-summary"><strong>{{ summary.complete }} of {{ statuses|length }}</strong> used <span>·</span> <strong>${{ "%.0f"|format(summary.used) }} of ${{ "%.0f"|format(summary.available) }}</strong> captured</p>
+    <div class="dashboard-summary" aria-label="Monthly benefit summary">
+      <div class="summary-stat">
+        <strong>{{ summary.complete }} <span>of {{ statuses|length }}</span></strong>
+        <small>Benefits used</small>
+      </div>
+      <div class="summary-stat summary-value">
+        <strong>${{ "%.0f"|format(summary.used) }} <span>of ${{ "%.0f"|format(summary.available) }}</span></strong>
+        <small>Value captured</small>
+      </div>
+    </div>
   </div>
   <div class="sync-control">
     {% if sync_state and sync_state['last_synced_at'] %}
@@ -87,12 +96,5 @@
   {% endfor %}
 </div>
 </section>
-{% if linked and analytics_summary.coverage_start %}
-<section class="dashboard-history" aria-label="Historical summary">
-  <p><strong>${{ "%.0f"|format(analytics_summary.measured_captured) }}</strong> of <strong>${{ "%.0f"|format(analytics_summary.available) }}</strong> potential captured {{ analytics_summary.range_label|lower }}</p>
-  <span>{{ analytics_summary.utilization }}% utilized · {{ analytics_summary.fee_recovery }}% of annual fee recovered</span>
-  <a href="{{ url_for('analytics_page') }}">Analytics <span aria-hidden="true">→</span></a>
-</section>
-{% endif %}
 <script src="{{ url_for('static', filename='refresh.js') }}"></script>
 {% endblock %}

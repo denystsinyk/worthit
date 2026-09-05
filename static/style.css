@@ -94,9 +94,20 @@ button, input, select { font: inherit; }
   letter-spacing: -.045em;
   line-height: 1;
 }
-.dashboard-summary { margin: 12px 0 0; color: var(--muted); font-size: .78rem; }
-.dashboard-summary strong { color: var(--text); font-weight: 650; }
-.dashboard-summary span { margin: 0 5px; color: #4d5562; }
+.dashboard-summary { margin-top: 16px; display: flex; gap: 8px; }
+.summary-stat {
+  min-width: 132px;
+  padding: 9px 12px;
+  display: grid;
+  gap: 3px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.summary-stat strong { color: var(--text); font-size: 1.05rem; font-weight: 700; letter-spacing: -.025em; }
+.summary-stat strong span { color: var(--muted); font-size: .7rem; font-weight: 550; letter-spacing: 0; }
+.summary-stat small { color: var(--muted); font-size: .57rem; font-weight: 650; letter-spacing: .065em; text-transform: uppercase; }
+.summary-value strong { color: var(--gold); }
 
 .notice {
   margin-top: 20px;
@@ -201,23 +212,6 @@ button, input, select { font: inherit; }
   font-size: .66rem;
 }
 .card-note { margin: 12px 0 0; color: #c2b4e9; font-size: .68rem; line-height: 1.45; }
-.dashboard-history {
-  min-height: 52px;
-  padding: 12px 15px;
-  display: grid;
-  grid-template-columns: 1.5fr 1fr auto;
-  align-items: center;
-  gap: 20px;
-  color: var(--muted);
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  font-size: .68rem;
-}
-.dashboard-history p { margin: 0; }
-.dashboard-history strong { color: var(--text); }
-.dashboard-history > span { text-align: center; }
-.dashboard-history a { color: var(--gold); font-weight: 700; text-decoration: none; white-space: nowrap; }
 
 @media (min-width: 761px) and (min-height: 720px) {
   body.page-dashboard { height: 100vh; overflow: hidden; }
@@ -328,8 +322,6 @@ button, input, select { font: inherit; }
   .notice .button { width: 100%; }
   .connection-page { padding: 64px 0; }
   .privacy-indicator { display: none; }
-  .dashboard-history { grid-template-columns: 1fr auto; }
-  .dashboard-history > span { grid-column: 1 / -1; grid-row: 2; text-align: left; }
   .metric-grid { grid-template-columns: repeat(2, 1fr); }
   .performance-row { grid-template-columns: 1fr auto; gap: 13px; }
   .performance-progress { grid-column: 1 / -1; grid-row: 2; }

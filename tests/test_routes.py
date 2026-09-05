@@ -106,6 +106,9 @@ def test_live_dashboard_renders_refresh_button(monkeypatch):
     assert b"state-pill" in response.data
     assert b"Not used yet" in response.data
     assert b"hero-total" not in response.data
+    assert b"Benefits used" in response.data
+    assert b"Value captured" in response.data
+    assert b"dashboard-history" not in response.data
 
 
 def test_live_dashboard_renders_sync_error_and_keeps_refresh_available(monkeypatch):
