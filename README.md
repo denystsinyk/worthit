@@ -61,14 +61,31 @@ for any public deployment:
 
 Set `DEMO_MODE=true` in `.env`, then run Docker Compose normally.
 
-## Develop without Docker
+## Run locally without Docker
+
+If Docker is unavailable (including when Docker Desktop's WSL integration is
+disabled), install the Python dependencies once:
 
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
-cp .env.example .env
+test -f .env || cp .env.example .env
+```
+
+Fill in `.env` as shown in Quick start. To use your real transactions, set
+`DEMO_MODE=false`, choose `PLAID_ENV=production`, and provide your production
+Plaid keys and a unique `FLASK_SECRET_KEY`. Then, from the project directory,
+start the app:
+
+```bash
 .venv/bin/python app.py
 ```
+
+Open [http://127.0.0.1:5000](http://127.0.0.1:5000). Keep that terminal open
+while using the app; press Ctrl+C to stop it. On later visits, run only
+`.venv/bin/python app.py` from the project directory. Use **Refresh now** to
+sync transactions when running this way; the 30-minute companion sync process
+is started only by Docker Compose. Local data is stored in `data/`.
 
 ## Configuration
 
